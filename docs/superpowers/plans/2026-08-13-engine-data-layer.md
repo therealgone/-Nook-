@@ -560,6 +560,7 @@ git commit -m "feat: add income entries repository"
 
 ```ts
 import { createTestDb } from '../../db/testDb';
+import { createCategory } from '../categories';
 import {
   logExpense,
   listExpenses,
@@ -571,7 +572,8 @@ import {
 
 test('logs an expense with a category', async () => {
   const db = createTestDb();
-  const expense = await logExpense(db, { amount: 25.5, categoryId: 1, date: '2026-08-12', note: 'lunch', isRecurring: false });
+  const category = await createCategory(db, { name: 'Dining', icon: 'utensils', color: '#f59e0b', budgetAmount: 100, budgetPeriod: 'weekly' });
+  const expense = await logExpense(db, { amount: 25.5, categoryId: category.id, date: '2026-08-12', note: 'lunch', isRecurring: false });
   expect(expense.amount).toBe(25.5);
 });
 
@@ -583,28 +585,35 @@ test('logs an expense with no category (piggy bank purchase)', async () => {
 
 test('filters expenses by date range and category', async () => {
   const db = createTestDb();
-  await logExpense(db, { amount: 10, categoryId: 1, date: '2026-08-01', note: null, isRecurring: false });
-  await logExpense(db, { amount: 20, categoryId: 1, date: '2026-08-15', note: null, isRecurring: false });
-  await logExpense(db, { amount: 30, categoryId: 2, date: '2026-08-15', note: null, isRecurring: false });
+  const cat1 = await createCategory(db, { name: 'Dining', icon: 'utensils', color: '#f59e0b', budgetAmount: 100, budgetPeriod: 'weekly' });
+  const cat2 = await createCategory(db, { name: 'Transport', icon: 'car', color: '#3b82f6', budgetAmount: 50, budgetPeriod: 'weekly' });
+
+  await logExpense(db, { amount: 10, categoryId: cat1.id, date: '2026-08-01', note: null, isRecurring: false });
+  await logExpense(db, { amount: 20, categoryId: cat1.id, date: '2026-08-15', note: null, isRecurring: false });
+  await logExpense(db, { amount: 30, categoryId: cat2.id, date: '2026-08-15', note: null, isRecurring: false });
 
   const inRange = await listExpenses(db, { from: '2026-08-10', to: '2026-08-20' });
   expect(inRange).toHaveLength(2);
 
-  const inCategory = await listExpenses(db, { categoryId: 2 });
+  const inCategory = await listExpenses(db, { categoryId: cat2.id });
   expect(inCategory).toHaveLength(1);
 });
 
 test('sums total expenses with an optional filter', async () => {
   const db = createTestDb();
-  await logExpense(db, { amount: 10, categoryId: 1, date: '2026-08-01', note: null, isRecurring: false });
-  await logExpense(db, { amount: 20, categoryId: 1, date: '2026-08-15', note: null, isRecurring: false });
+  const category = await createCategory(db, { name: 'Dining', icon: 'utensils', color: '#f59e0b', budgetAmount: 100, budgetPeriod: 'weekly' });
+
+  await logExpense(db, { amount: 10, categoryId: category.id, date: '2026-08-01', note: null, isRecurring: false });
+  await logExpense(db, { amount: 20, categoryId: category.id, date: '2026-08-15', note: null, isRecurring: false });
   expect(await totalExpenses(db)).toBe(30);
   expect(await totalExpenses(db, { from: '2026-08-10', to: '2026-08-20' })).toBe(20);
 });
 
 test('updates and deletes an expense', async () => {
   const db = createTestDb();
-  const expense = await logExpense(db, { amount: 10, categoryId: 1, date: '2026-08-01', note: null, isRecurring: false });
+  const category = await createCategory(db, { name: 'Dining', icon: 'utensils', color: '#f59e0b', budgetAmount: 100, budgetPeriod: 'weekly' });
+
+  const expense = await logExpense(db, { amount: 10, categoryId: category.id, date: '2026-08-01', note: null, isRecurring: false });
   const updated = await updateExpense(db, expense.id, { amount: 15 });
   expect(updated.amount).toBe(15);
   await deleteExpense(db, expense.id);
@@ -1256,13 +1265,15 @@ git commit -m "feat: add piggy bank cancel/price-change/purchase lifecycle"
 ```ts
 import { createTestDb } from '../../db/testDb';
 import { logExpense } from '../../repositories/expenses';
+import { createCategory } from '../../repositories/categories';
 import { getPeriodSpend, heatmapColorForPercent } from '../budgetPeriods';
 
 test('computes spend and percent used for a period', async () => {
   const db = createTestDb();
-  await logExpense(db, { amount: 20, categoryId: 1, date: '2026-08-05', note: null, isRecurring: false });
-  await logExpense(db, { amount: 30, categoryId: 1, date: '2026-08-07', note: null, isRecurring: false });
-  await logExpense(db, { amount: 999, categoryId: 1, date: '2026-09-01', note: null, isRecurring: false });
+  const category = await createCategory(db, { name: 'Dining', icon: 'utensils', color: '#f59e0b', budgetAmount: 100, budgetPeriod: 'weekly' });
+  await logExpense(db, { amount: 20, categoryId: category.id, date: '2026-08-05', note: null, isRecurring: false });
+  await logExpense(db, { amount: 30, categoryId: category.id, date: '2026-08-07', note: null, isRecurring: false });
+  await logExpense(db, { amount: 999, categoryId: category.id, date: '2026-09-01', note: null, isRecurring: false });
 
   const result = await getPeriodSpend(db, '2026-08-01', '2026-08-31', 100);
   expect(result.spentAmount).toBe(50);
@@ -1353,6 +1364,7 @@ git commit -m "feat: add budget period math and heatmap color thresholds"
 
 ```ts
 import { createTestDb } from '../../db/testDb';
+import { createCategory } from '../categories';
 import {
   createRecurringPayment,
   listRecurringPayments,
@@ -1362,10 +1374,11 @@ import {
 
 test('creates, lists, updates, and deletes recurring payments', async () => {
   const db = createTestDb();
+  const category = await createCategory(db, { name: 'Subscriptions', icon: 'tv', color: '#8b5cf6', budgetAmount: 50, budgetPeriod: 'monthly' });
   const payment = await createRecurringPayment(db, {
     label: 'Netflix',
     amount: 15.99,
-    categoryId: 1,
+    categoryId: category.id,
     frequency: 'monthly',
     nextDueDate: '2026-09-01',
   });
@@ -1430,16 +1443,18 @@ Expected: PASS
 
 ```ts
 import { createTestDb } from '../../db/testDb';
+import { createCategory } from '../../repositories/categories';
 import { createRecurringPayment, listRecurringPayments } from '../../repositories/recurringPayments';
 import { listExpenses } from '../../repositories/expenses';
 import { materializeDuePayments } from '../recurringMaterialization';
 
 test('materializes a due monthly payment as a real, editable expense and advances its due date', async () => {
   const db = createTestDb();
+  const category = await createCategory(db, { name: 'Housing', icon: 'home', color: '#0ea5e9', budgetAmount: 1500, budgetPeriod: 'monthly' });
   await createRecurringPayment(db, {
     label: 'Rent',
     amount: 1200,
-    categoryId: 1,
+    categoryId: category.id,
     frequency: 'monthly',
     nextDueDate: '2026-08-01',
   });
@@ -1456,10 +1471,11 @@ test('materializes a due monthly payment as a real, editable expense and advance
 
 test('materializes every missed occurrence when the app has not been opened in a while', async () => {
   const db = createTestDb();
+  const category = await createCategory(db, { name: 'Fitness', icon: 'dumbbell', color: '#22c55e', budgetAmount: 200, budgetPeriod: 'monthly' });
   await createRecurringPayment(db, {
     label: 'Gym',
     amount: 40,
-    categoryId: 1,
+    categoryId: category.id,
     frequency: 'weekly',
     nextDueDate: '2026-07-01',
   });
@@ -1471,10 +1487,11 @@ test('materializes every missed occurrence when the app has not been opened in a
 
 test('does not materialize a payment that is not yet due', async () => {
   const db = createTestDb();
+  const category = await createCategory(db, { name: 'Insurance', icon: 'shield', color: '#f97316', budgetAmount: 100, budgetPeriod: 'monthly' });
   await createRecurringPayment(db, {
     label: 'Insurance',
     amount: 100,
-    categoryId: 1,
+    categoryId: category.id,
     frequency: 'yearly',
     nextDueDate: '2027-01-01',
   });
@@ -1566,14 +1583,16 @@ git commit -m "feat: add recurring payments repository and materialization engin
 
 ```ts
 import { createTestDb } from '../../db/testDb';
+import { createCategory } from '../categories';
 import { createThreshold, listThresholdsFor, deleteThreshold } from '../notificationThresholds';
 
 test('creates and lists thresholds scoped to a category, or overall when categoryId is null', async () => {
   const db = createTestDb();
-  await createThreshold(db, { categoryId: 1, thresholdPct: 80 });
+  const category = await createCategory(db, { name: 'Dining', icon: 'utensils', color: '#f59e0b', budgetAmount: 100, budgetPeriod: 'weekly' });
+  await createThreshold(db, { categoryId: category.id, thresholdPct: 80 });
   await createThreshold(db, { categoryId: null, thresholdPct: 90 });
 
-  expect(await listThresholdsFor(db, 1)).toHaveLength(1);
+  expect(await listThresholdsFor(db, category.id)).toHaveLength(1);
   expect(await listThresholdsFor(db, null)).toHaveLength(1);
 });
 
