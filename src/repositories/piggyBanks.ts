@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { piggyBanks, type PiggyBank } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export interface CreatePiggyBankInput {
   productName: string;

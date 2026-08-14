@@ -1,4 +1,4 @@
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 import { totalExpenses } from '../repositories/expenses';
 
 export interface PeriodSpend {
@@ -12,8 +12,9 @@ export async function getPeriodSpend(
   from: string,
   to: string,
   targetAmount: number,
+  categoryId?: number,
 ): Promise<PeriodSpend> {
-  const spentAmount = await totalExpenses(db, { from, to });
+  const spentAmount = await totalExpenses(db, { from, to, categoryId });
   const percentUsed = targetAmount === 0 ? 0 : (spentAmount / targetAmount) * 100;
   return { spentAmount, targetAmount, percentUsed };
 }

@@ -23,8 +23,8 @@ export const categories = sqliteTable('categories', {
   name: text('name').notNull(),
   icon: text('icon').notNull(),
   color: text('color').notNull(),
-  budgetAmount: real('budget_amount').notNull(),
-  budgetPeriod: text('budget_period', { enum: ['weekly', 'monthly'] }).notNull(),
+  budgetAmount: real('budget_amount'),
+  budgetPeriod: text('budget_period', { enum: ['weekly', 'monthly'] }),
 });
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
@@ -44,12 +44,22 @@ export const recurringPayments = sqliteTable('recurring_payments', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   label: text('label').notNull(),
   amount: real('amount').notNull(),
-  categoryId: integer('category_id').notNull().references(() => categories.id),
+  categoryId: integer('category_id').references(() => categories.id),
   frequency: text('frequency', { enum: ['weekly', 'monthly', 'yearly'] }).notNull(),
   nextDueDate: text('next_due_date').notNull(),
 });
 export type RecurringPayment = typeof recurringPayments.$inferSelect;
 export type NewRecurringPayment = typeof recurringPayments.$inferInsert;
+
+export const recurringIncome = sqliteTable('recurring_income', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  amount: real('amount').notNull(),
+  frequency: text('frequency', { enum: ['weekly', 'monthly', 'yearly'] }).notNull(),
+  nextDueDate: text('next_due_date').notNull(),
+  note: text('note'),
+});
+export type RecurringIncome = typeof recurringIncome.$inferSelect;
+export type NewRecurringIncome = typeof recurringIncome.$inferInsert;
 
 export const notificationThresholds = sqliteTable('notification_thresholds', {
   id: integer('id').primaryKey({ autoIncrement: true }),

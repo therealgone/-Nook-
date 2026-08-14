@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS categories (
   name TEXT NOT NULL,
   icon TEXT NOT NULL,
   color TEXT NOT NULL,
-  budget_amount REAL NOT NULL,
-  budget_period TEXT NOT NULL
+  budget_amount REAL,
+  budget_period TEXT
 );
 CREATE TABLE IF NOT EXISTS expenses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,9 +31,16 @@ CREATE TABLE IF NOT EXISTS recurring_payments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   label TEXT NOT NULL,
   amount REAL NOT NULL,
-  category_id INTEGER NOT NULL REFERENCES categories(id),
+  category_id INTEGER REFERENCES categories(id),
   frequency TEXT NOT NULL,
   next_due_date TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS recurring_income (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  amount REAL NOT NULL,
+  frequency TEXT NOT NULL,
+  next_due_date TEXT NOT NULL,
+  note TEXT
 );
 CREATE TABLE IF NOT EXISTS notification_thresholds (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

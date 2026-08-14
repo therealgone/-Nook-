@@ -1,15 +1,8 @@
-import type { AppDb } from '../db/testDb';
-import type { Expense, RecurringPayment } from '../db/schema';
+import type { AppDb } from '../db/types';
+import type { Expense } from '../db/schema';
 import { listRecurringPayments, updateRecurringPayment } from '../repositories/recurringPayments';
 import { logExpense } from '../repositories/expenses';
-
-function advanceDate(date: string, frequency: RecurringPayment['frequency']): string {
-  const d = new Date(`${date}T00:00:00.000Z`);
-  if (frequency === 'weekly') d.setUTCDate(d.getUTCDate() + 7);
-  else if (frequency === 'monthly') d.setUTCMonth(d.getUTCMonth() + 1);
-  else d.setUTCFullYear(d.getUTCFullYear() + 1);
-  return d.toISOString().slice(0, 10);
-}
+import { advanceDate } from './recurrence';
 
 export async function materializeDuePayments(db: AppDb, today: string): Promise<Expense[]> {
   const payments = await listRecurringPayments(db);

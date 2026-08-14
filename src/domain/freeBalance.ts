@@ -1,4 +1,4 @@
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 import { totalIncome } from '../repositories/income';
 import { totalExpenses } from '../repositories/expenses';
 import { getTotalActiveSavings } from '../repositories/piggyBankTransactions';

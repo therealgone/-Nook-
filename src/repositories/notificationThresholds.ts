@@ -1,6 +1,6 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import { notificationThresholds, type NotificationThreshold, type NewNotificationThreshold } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export async function createThreshold(
   db: AppDb,
@@ -16,6 +16,10 @@ export async function listThresholdsFor(db: AppDb, categoryId: number | null): P
       ? isNull(notificationThresholds.categoryId)
       : eq(notificationThresholds.categoryId, categoryId);
   return db.select().from(notificationThresholds).where(condition);
+}
+
+export async function listAllThresholds(db: AppDb): Promise<NotificationThreshold[]> {
+  return db.select().from(notificationThresholds);
 }
 
 export async function deleteThreshold(db: AppDb, id: number): Promise<void> {

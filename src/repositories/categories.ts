@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { categories, type Category, type NewCategory } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export async function createCategory(db: AppDb, input: Omit<NewCategory, 'id'>): Promise<Category> {
   const [row] = await db.insert(categories).values(input).returning();

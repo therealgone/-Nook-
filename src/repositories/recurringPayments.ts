@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { recurringPayments, type RecurringPayment, type NewRecurringPayment } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export async function createRecurringPayment(
   db: AppDb,

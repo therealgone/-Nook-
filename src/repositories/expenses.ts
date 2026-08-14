@@ -1,6 +1,6 @@
 import { and, eq, gte, lte } from 'drizzle-orm';
 import { expenses, type Expense, type NewExpense } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export interface ExpenseFilter {
   from?: string;

@@ -1,6 +1,6 @@
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 import type { Expense, PiggyBankTransaction, IncomeEntry } from '../db/schema';
-import { getExpense, updateExpense } from '../repositories/expenses';
+import { deleteExpense, getExpense, updateExpense } from '../repositories/expenses';
 import { recordTransaction, getSavedAmount, getLastTransactionDate } from '../repositories/piggyBankTransactions';
 import { updateIncome } from '../repositories/income';
 import { listPiggyBanks } from '../repositories/piggyBanks';
@@ -22,6 +22,20 @@ export async function handleExpenseAmountChanged(
   const sweepAvailable = freeBalanceAfter > freeBalanceBefore ? freeBalanceAfter - freeBalanceBefore : 0;
 
   return { expense, deficit, sweepAvailable };
+}
+
+export async function handleExpenseDeleted(
+  db: AppDb,
+  expenseId: number,
+): Promise<{ deficit: number; sweepAvailable: number }> {
+  const freeBalanceBefore = await calculateFreeBalance(db);
+  await deleteExpense(db, expenseId);
+  const freeBalanceAfter = await calculateFreeBalance(db);
+
+  const deficit = freeBalanceAfter < 0 ? -freeBalanceAfter : 0;
+  const sweepAvailable = freeBalanceAfter > freeBalanceBefore ? freeBalanceAfter - freeBalanceBefore : 0;
+
+  return { deficit, sweepAvailable };
 }
 
 export async function borrowFromPiggyBank(

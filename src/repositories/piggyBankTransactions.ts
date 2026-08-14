@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { piggyBanks, piggyBankTransactions, type PiggyBankTransaction } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export interface RecordTransactionInput {
   piggyBankId: number;

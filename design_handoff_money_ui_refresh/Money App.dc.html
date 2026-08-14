@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-bc2839fb-57f2-441d-a0a2-de399fff03ba/styles.css">
+<script src="_ds/nocturne-bc2839fb-57f2-441d-a0a2-de399fff03ba/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+body{margin:0;background:#0e0f19;font-family:Inter,system-ui,sans-serif}
+a{color:#b5abfc;text-decoration:none}a:hover{color:#d2cefd}
+*{-webkit-font-smoothing:antialiased}
+[data-om-starter="android-frame"]{border-color:rgba(63,66,77,.7)!important;background:#161826!important}
+@keyframes mScreen{from{opacity:0;transform:translateY(10px) scale(.995)}to{opacity:1;transform:none}}
+@keyframes mSheet{from{transform:translateY(105%)}to{transform:none}}
+@keyframes mFade{from{opacity:0}to{opacity:1}}
+@keyframes mPop{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes mGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes mGlow{0%,100%{opacity:.55;transform:translate(-50%,0) scale(1)}50%{opacity:.85;transform:translate(-50%,0) scale(1.08)}}
+@keyframes mRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.mrow{transition:background .18s ease}
+.mrow:active{background:rgba(145,132,217,.10)}
+.mtap{transition:transform .16s cubic-bezier(.2,.8,.25,1),background .18s ease,border-color .18s ease}
+.mtap:active{transform:scale(.955)}
+.mscroll::-webkit-scrollbar{display:none}
+.mscroll{scrollbar-width:none}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;background:radial-gradient(1200px 600px at 50% -10%, #1b1d31 0%, #0e0f19 70%)">
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="412px,892px">
+
+<div style="height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden;background:#161826;color:#e9e9ed;font-family:Inter,system-ui,sans-serif">
+
+<div class="mscroll" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="animation:mScreen .34s cubic-bezier(.2,.8,.25,1);padding:4px 0 120px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 0">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(150deg,#9184d9,#5d5294);display:flex;align-items:center;justify-content:center"><i class="ph-fill ph-wallet" style="font-size:14px;color:#171826"></i></div>
+      <span style="font-size:14px;font-weight:500;letter-spacing:.02em;color:#e9e9ed">Money</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="mtap" onClick="{{ openSearch }}" style="width:36px;height:36px;border-radius:12px;background:#232532;border:1px solid #2f3243;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ph ph-bell-simple" style="font-size:17px;color:#b2b6ca"></i></div>
+      <div class="mtap" onClick="{{ openSettings }}" style="width:36px;height:36px;border-radius:12px;background:#232532;border:1px solid #2f3243;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ph ph-gear-six" style="font-size:17px;color:#b2b6ca"></i></div>
+    </div>
+  </div>
+
+  <div style="position:relative;padding:30px 20px 26px;overflow:hidden">
+    <div style="position:absolute;left:50%;top:-70px;width:320px;height:220px;border-radius:50%;background:radial-gradient(closest-side,rgba(145,132,217,.30),rgba(145,132,217,0));animation:mGlow 6s ease-in-out infinite;pointer-events:none"></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#9184d9">Free balance</span>
+      <div style="display:flex;align-items:baseline;gap:3px;font-feature-settings:'tnum'">
+        <span style="font-size:30px;font-weight:300;color:#9397ab;line-height:1">{{ symbol }}</span>
+        <span style="font-size:58px;font-weight:500;letter-spacing:-.035em;line-height:1;color:#f3f5fe">{{ balanceWhole }}</span>
+        <span style="font-size:24px;font-weight:400;color:#75798c;line-height:1">.{{ balanceCents }}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:999px;background:#2b2741;color:#d2cefd"><i class="ph-fill ph-arrow-down-right" style="font-size:11px"></i>{{ monthSpendLabel }} this month</span>
+        <span style="font-size:11.5px;color:#75798c">{{ daysLeft }} days left</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin:0 20px;padding:16px 16px 14px;border-radius:14px;background:linear-gradient(180deg,#232532,#1e2030);border:1px solid #2f3243;display:flex;flex-direction:column;gap:14px">
+    <sc-for list="{{ bars }}" as="b" hint-placeholder-count="2">
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <span style="font-size:12.5px;color:#cfd3e5;font-weight:500">{{ b.label }}</span>
+          <span style="font-size:12px;color:#75798c;font-feature-settings:'tnum'">{{ b.value }} <span style="color:#4d5162">/ {{ b.target }}</span></span>
+        </div>
+        <div style="height:7px;border-radius:999px;background:#171927;overflow:hidden;position:relative">
+          <div style="height:100%;border-radius:999px;transform-origin:left;animation:mGrow .7s cubic-bezier(.2,.8,.25,1);transition:width .5s cubic-bezier(.2,.8,.25,1),background .3s;width:{{ b.pct }}%;background:{{ b.color }};box-shadow:0 0 12px {{ b.glow }}"></div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div class="mscroll" style="margin-top:18px;padding:0 20px;display:flex;gap:8px;overflow-x:auto">
+    <sc-for list="{{ catChips }}" as="c" hint-placeholder-count="6">
+      <div class="mtap" onClick="{{ c.onClick }}" style="flex:none;display:flex;align-items:center;gap:7px;padding:8px 13px 8px 8px;border-radius:999px;background:#232532;border:1px solid #2f3243;cursor:pointer">
+        <span style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ c.tint }}"><i class="ph-fill {{ c.icon }}" style="font-size:12px;color:{{ c.color }}"></i></span>
+        <span style="font-size:12.5px;color:#cfd3e5;white-space:nowrap">{{ c.name }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;align-items:baseline;justify-content:space-between;padding:26px 20px 10px">
+    <span style="font-size:15px;font-weight:500;color:#e9e9ed;letter-spacing:-.01em">Recent</span>
+    <span onClick="{{ goHistory }}" style="font-size:12px;color:#b5abfc;cursor:pointer">All activity</span>
+  </div>
+  <div style="padding:0 20px">
+    <sc-for list="{{ recent }}" as="r" hint-placeholder-count="6">
+      <div class="mrow" style="display:flex;align-items:center;gap:12px;padding:11px 10px;margin:0 -10px;border-radius:12px;cursor:pointer">
+        <span style="width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ r.tint }}"><i class="ph-fill {{ r.icon }}" style="font-size:17px;color:{{ r.color }}"></i></span>
+        <span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+          <span style="font-size:13.5px;color:#e9e9ed;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</span>
+          <span style="font-size:11.5px;color:#75798c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</span>
+        </span>
+        <span style="font-size:14px;color:#e4e7f5;font-feature-settings:'tnum';font-weight:500">{{ r.amount }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+<div style="animation:mScreen .34s cubic-bezier(.2,.8,.25,1);padding:12px 0 120px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 20px 18px">
+    <div class="mtap" onClick="{{ prevMonth }}" style="width:34px;height:34px;border-radius:11px;background:#232532;border:1px solid #2f3243;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ph ph-caret-left" style="font-size:15px;color:#b2b6ca"></i></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+      <span style="font-size:16px;font-weight:500;letter-spacing:-.01em">{{ monthLabel }}</span>
+      <span style="font-size:11px;color:#75798c;font-feature-settings:'tnum'">{{ monthSpendLabel }} spent</span>
+    </div>
+    <div class="mtap" onClick="{{ nextMonth }}" style="width:34px;height:34px;border-radius:11px;background:#232532;border:1px solid #2f3243;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ph ph-caret-right" style="font-size:15px;color:#b2b6ca"></i></div>
+  </div>
+
+  <div style="margin:0 16px;padding:16px 14px;border-radius:16px;background:#1e2030;border:1px solid #2b2e3d">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px">
+      <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+        <span style="text-align:center;font-size:10px;letter-spacing:.08em;color:#5d6172">{{ w.l }}</span>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+        <div class="mtap" onClick="{{ c.onClick }}" style="aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;background:{{ c.bg }};border:1px solid {{ c.border }}">
+          <span style="font-size:11.5px;font-feature-settings:'tnum';color:{{ c.fg }}">{{ c.day }}</span>
+          <span style="width:3px;height:3px;border-radius:50%;background:{{ c.dot }}"></span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;margin-top:14px">
+      <span style="font-size:10px;color:#5d6172">Calm</span>
+      <sc-for list="{{ legend }}" as="g" hint-placeholder-count="4">
+        <span style="flex:1;height:5px;border-radius:999px;background:{{ g.c }}"></span>
+      </sc-for>
+      <span style="font-size:10px;color:#5d6172">Over</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;padding:16px 16px 0">
+    <sc-for list="{{ monthStats }}" as="s" hint-placeholder-count="3">
+      <div style="flex:1;padding:13px 12px;border-radius:14px;background:#1e2030;border:1px solid #2b2e3d;display:flex;flex-direction:column;gap:5px">
+        <span style="font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#5d6172">{{ s.label }}</span>
+        <span style="font-size:17px;font-weight:500;font-feature-settings:'tnum';color:{{ s.color }}">{{ s.value }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="padding:24px 20px 8px;font-size:15px;font-weight:500">This month</div>
+  <div style="padding:0 20px">
+    <sc-for list="{{ monthList }}" as="r" hint-placeholder-count="8">
+      <div class="mrow" onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:12px;padding:11px 10px;margin:0 -10px;border-radius:12px;cursor:pointer">
+        <span style="width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ r.tint }}"><i class="ph-fill {{ r.icon }}" style="font-size:17px;color:{{ r.color }}"></i></span>
+        <span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+          <span style="font-size:13.5px;color:#e9e9ed;font-weight:500">{{ r.title }}</span>
+          <span style="font-size:11.5px;color:#75798c">{{ r.sub }}</span>
+        </span>
+        <span style="font-size:14px;color:#e4e7f5;font-feature-settings:'tnum';font-weight:500">{{ r.amount }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isInsights }}" hint-placeholder-val="{{ false }}">
+<div style="animation:mScreen .34s cubic-bezier(.2,.8,.25,1);padding:12px 0 120px">
+  <div style="padding:6px 20px 0;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:20px;font-weight:500;letter-spacing:-.02em">Insights</span>
+    <div style="display:flex;padding:3px;border-radius:999px;background:#1e2030;border:1px solid #2b2e3d">
+      <sc-for list="{{ periods }}" as="p" hint-placeholder-count="2">
+        <span class="mtap" onClick="{{ p.onClick }}" style="padding:6px 14px;border-radius:999px;font-size:12px;cursor:pointer;color:{{ p.fg }};background:{{ p.bg }}">{{ p.label }}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin:20px 20px 0;padding:18px;border-radius:16px;background:linear-gradient(180deg,#232532,#1c1e2c);border:1px solid #2f3243">
+    <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#9184d9">{{ periodLabel }} spend</span>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px">
+      <span style="font-size:34px;font-weight:500;letter-spacing:-.03em;font-feature-settings:'tnum'">{{ periodSpend }}</span>
+      <span style="font-size:12px;color:#75798c">of {{ periodBudget }} budgeted</span>
+    </div>
+    <div style="display:flex;gap:3px;margin-top:16px;height:9px">
+      <sc-for list="{{ composition }}" as="s" hint-placeholder-count="5">
+        <span style="border-radius:3px;animation:mGrow .6s cubic-bezier(.2,.8,.25,1);transform-origin:left;flex:{{ s.flex }};background:{{ s.color }}"></span>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:14px">
+      <sc-for list="{{ composition }}" as="s" hint-placeholder-count="5">
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#9397ab"><span style="width:7px;height:7px;border-radius:2px;background:{{ s.color }}"></span>{{ s.name }}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="padding:24px 20px 10px;font-size:15px;font-weight:500">By category</div>
+  <div style="padding:0 20px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ insights }}" as="c" hint-placeholder-count="6">
+      <div style="padding:14px;border-radius:14px;background:#1e2030;border:1px solid #2b2e3d;display:flex;flex-direction:column;gap:11px;animation:mRise .4s cubic-bezier(.2,.8,.25,1) both">
+        <div style="display:flex;align-items:center;gap:11px">
+          <span style="width:32px;height:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ c.tint }}"><i class="ph-fill {{ c.icon }}" style="font-size:15px;color:{{ c.color }}"></i></span>
+          <span style="flex:1;font-size:13.5px;font-weight:500">{{ c.name }}</span>
+          <span style="font-size:12.5px;font-feature-settings:'tnum';color:#cfd3e5">{{ c.spent }} <span style="color:#5d6172">{{ c.of }}</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="flex:1;height:6px;border-radius:999px;background:#171927;overflow:hidden;display:block">
+            <span style="display:block;height:100%;border-radius:999px;transform-origin:left;animation:mGrow .7s cubic-bezier(.2,.8,.25,1);width:{{ c.pct }}%;background:{{ c.bar }}"></span>
+          </span>
+          <span style="font-size:11px;width:38px;text-align:right;font-feature-settings:'tnum';color:{{ c.pctColor }}">{{ c.pctLabel }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGoals }}" hint-placeholder-val="{{ false }}">
+<div style="animation:mScreen .34s cubic-bezier(.2,.8,.25,1);padding:12px 0 120px">
+  <div style="padding:6px 20px 0;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <span style="font-size:20px;font-weight:500;letter-spacing:-.02em">Piggy banks</span>
+      <span style="font-size:11.5px;color:#75798c">{{ goalsSaved }} saved across {{ goalsCount }} goals</span>
+    </div>
+    <div class="mtap" onClick="{{ openNewGoal }}" style="display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;border:1px solid #5d5294;background:rgba(145,132,217,.10);cursor:pointer"><i class="ph ph-plus" style="font-size:13px;color:#b5abfc"></i><span style="font-size:12px;color:#d2cefd">New</span></div>
+  </div>
+
+  <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+    <sc-for list="{{ goals }}" as="g" hint-placeholder-count="3">
+      <div class="mtap" onClick="{{ g.onClick }}" style="position:relative;overflow:hidden;padding:16px;border-radius:16px;background:{{ g.bg }};border:1px solid {{ g.border }};display:flex;align-items:center;gap:16px;cursor:pointer;animation:mRise .42s cubic-bezier(.2,.8,.25,1) both">
+        <span style="position:relative;width:62px;height:62px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient({{ g.ring }} {{ g.deg }}deg, #262938 0deg)">
+          <span style="position:absolute;inset:5px;border-radius:50%;background:#1b1d2b;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;font-feature-settings:'tnum';color:{{ g.ring }}">{{ g.pctLabel }}</span>
+        </span>
+        <span style="flex:1;display:flex;flex-direction:column;gap:5px;min-width:0">
+          <span style="font-size:14.5px;font-weight:500">{{ g.name }}</span>
+          <span style="font-size:12px;color:#9397ab;font-feature-settings:'tnum'">{{ g.saved }} <span style="color:#5d6172">of {{ g.target }}</span></span>
+          <span style="font-size:11px;color:{{ g.noteColor }}">{{ g.note }}</span>
+        </span>
+        <i class="ph ph-caret-right" style="font-size:15px;color:#4d5162"></i>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+</div>
+
+<div style="position:absolute;left:0;right:0;bottom:0;padding:0 14px 12px;background:linear-gradient(180deg,rgba(22,24,38,0),rgba(22,24,38,.92) 42%,#161826)">
+  <div style="position:relative;height:62px;border-radius:22px;background:rgba(30,32,48,.92);border:1px solid #2f3243;backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 8px">
+    <sc-for list="{{ tabsLeft }}" as="t" hint-placeholder-count="2">
+      <span class="mtap" onClick="{{ t.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 0">
+        <i class="{{ t.icon }}" style="font-size:19px;color:{{ t.color }}"></i>
+        <span style="font-size:9.5px;letter-spacing:.03em;color:{{ t.color }}">{{ t.label }}</span>
+      </span>
+    </sc-for>
+    <span style="width:74px"></span>
+    <sc-for list="{{ tabsRight }}" as="t" hint-placeholder-count="2">
+      <span class="mtap" onClick="{{ t.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 0">
+        <i class="{{ t.icon }}" style="font-size:19px;color:{{ t.color }}"></i>
+        <span style="font-size:9.5px;letter-spacing:.03em;color:{{ t.color }}">{{ t.label }}</span>
+      </span>
+    </sc-for>
+    <span class="mtap" onClick="{{ openAdd }}" style="position:absolute;left:50%;top:-22px;transform:translateX(-50%);width:60px;height:60px;border-radius:22px;background:linear-gradient(155deg,#a396ec,#6f61b8);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 26px rgba(93,82,148,.55),inset 0 1px 0 rgba(255,255,255,.22)">
+      <i class="ph-fill ph-plus" style="font-size:24px;color:#171826"></i>
+    </span>
+  </div>
+</div>
+
+<sc-if value="{{ settingsOpen }}" hint-placeholder-val="{{ false }}">
+<div class="mscroll" style="position:absolute;inset:0;background:#161826;overflow-y:auto;animation:mScreen .3s cubic-bezier(.2,.8,.25,1);z-index:20">
+  <div style="display:flex;align-items:center;gap:12px;padding:16px 20px 8px;position:sticky;top:0;background:linear-gradient(180deg,#161826 70%,rgba(22,24,38,0))">
+    <div class="mtap" onClick="{{ settingsBack }}" style="width:36px;height:36px;border-radius:12px;background:#232532;border:1px solid #2f3243;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ph ph-arrow-left" style="font-size:16px;color:#cfd3e5"></i></div>
+    <span style="font-size:18px;font-weight:500;letter-spacing:-.01em">{{ settingsTitle }}</span>
+  </div>
+
+  <sc-if value="{{ isSettingsHub }}" hint-placeholder-val="{{ true }}">
+  <div style="padding:8px 20px 40px;display:flex;flex-direction:column;gap:10px">
+    <div style="padding:16px;border-radius:16px;background:linear-gradient(150deg,#2b2741,#1e2030);border:1px solid #3a3556;display:flex;align-items:center;gap:14px">
+      <span style="width:44px;height:44px;border-radius:14px;background:rgba(145,132,217,.18);display:flex;align-items:center;justify-content:center"><i class="ph-fill ph-user" style="font-size:20px;color:#b5abfc"></i></span>
+      <span style="flex:1;display:flex;flex-direction:column;gap:3px">
+        <span style="font-size:14px;font-weight:500">Monthly plan</span>
+        <span style="font-size:11.5px;color:#9397ab">{{ incomeLabel }} income · {{ fixedLabel }} fixed</span>
+      </span>
+    </div>
+    <sc-for list="{{ settingsCards }}" as="s" hint-placeholder-count="5">
+      <div class="mtap" onClick="{{ s.onClick }}" style="padding:15px;border-radius:16px;background:#1e2030;border:1px solid #2b2e3d;display:flex;align-items:center;gap:13px;cursor:pointer">
+        <span style="width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ s.tint }}"><i class="ph-fill {{ s.icon }}" style="font-size:18px;color:{{ s.color }}"></i></span>
+        <span style="flex:1;display:flex;flex-direction:column;gap:3px">
+          <span style="font-size:13.5px;font-weight:500">{{ s.title }}</span>
+          <span style="font-size:11.5px;color:#75798c">{{ s.sub }}</span>
+        </span>
+        <span style="font-size:11px;color:#5d6172">{{ s.count }}</span>
+        <i class="ph ph-caret-right" style="font-size:14px;color:#4d5162"></i>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isSettingsPage }}" hint-placeholder-val="{{ false }}">
+  <div style="padding:8px 20px 40px">
+    <p style="margin:0 0 16px;font-size:12.5px;line-height:1.5;color:#75798c;max-width:300px">{{ pageBlurb }}</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ pageRows }}" as="r" hint-placeholder-count="4">
+        <div style="padding:13px 14px;border-radius:14px;background:#1e2030;border:1px solid #2b2e3d;display:flex;align-items:center;gap:12px;animation:mRise .34s cubic-bezier(.2,.8,.25,1) both">
+          <span style="width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ r.tint }}"><i class="ph-fill {{ r.icon }}" style="font-size:16px;color:{{ r.color }}"></i></span>
+          <span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+            <span style="font-size:13px;font-weight:500">{{ r.title }}</span>
+            <span style="font-size:11px;color:#75798c">{{ r.sub }}</span>
+          </span>
+          <span style="font-size:13px;font-feature-settings:'tnum';color:{{ r.valueColor }}">{{ r.value }}</span>
+          <span class="mtap" onClick="{{ r.onDelete }}" style="width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#242636;cursor:pointer"><i class="ph ph-trash" style="font-size:14px;color:#8d6b76"></i></span>
+        </div>
+      </sc-for>
+    </div>
+    <div class="mtap" onClick="{{ pageAdd }}" style="margin-top:14px;padding:13px;border-radius:14px;border:1px dashed #4a4d63;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><i class="ph ph-plus" style="font-size:14px;color:#b5abfc"></i><span style="font-size:12.5px;color:#d2cefd">{{ pageAddLabel }}</span></div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(9,10,17,.62);backdrop-filter:blur(3px);animation:mFade .22s ease;z-index:30"></div>
+</sc-if>
+
+<sc-if value="{{ isAddSheet }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:31;border-radius:26px 26px 0 0;background:#1c1e2c;border-top:1px solid #343751;box-shadow:0 -24px 60px rgba(0,0,0,.5);animation:mSheet .34s cubic-bezier(.2,.85,.3,1);padding:10px 18px 18px">
+  <div style="width:38px;height:4px;border-radius:999px;background:#3f424d;margin:0 auto 14px"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:15px;font-weight:500">New expense</span>
+    <span class="mtap" onClick="{{ closeSheet }}" style="width:30px;height:30px;border-radius:10px;background:#252838;display:flex;align-items:center;justify-content:center;cursor:pointer"><i class="ph ph-x" style="font-size:14px;color:#9397ab"></i></span>
+  </div>
+
+  <div style="display:flex;align-items:baseline;justify-content:center;gap:3px;padding:22px 0 6px">
+    <span style="font-size:24px;color:#75798c;font-weight:300">{{ symbol }}</span>
+    <span style="font-size:52px;font-weight:500;letter-spacing:-.03em;font-feature-settings:'tnum';color:{{ amountColor }}">{{ amountDisplay }}</span>
+    <span style="width:2px;height:40px;background:#9184d9;animation:mFade 1s steps(1) infinite alternate"></span>
+  </div>
+  <div style="display:flex;justify-content:center;gap:8px;padding-bottom:14px">
+    <sc-for list="{{ quickAmounts }}" as="q" hint-placeholder-count="4">
+      <span class="mtap" onClick="{{ q.onClick }}" style="padding:6px 13px;border-radius:999px;background:#252838;border:1px solid #33364a;font-size:12px;color:#cfd3e5;cursor:pointer;font-feature-settings:'tnum'">{{ q.label }}</span>
+    </sc-for>
+  </div>
+
+  <div class="mscroll" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:14px">
+    <sc-for list="{{ sheetCats }}" as="c" hint-placeholder-count="6">
+      <span class="mtap" onClick="{{ c.onClick }}" style="flex:none;display:flex;align-items:center;gap:7px;padding:7px 12px 7px 7px;border-radius:999px;cursor:pointer;background:{{ c.bg }};border:1px solid {{ c.border }}">
+        <span style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ c.tint }}"><i class="ph-fill {{ c.icon }}" style="font-size:11px;color:{{ c.color }}"></i></span>
+        <span style="font-size:12px;white-space:nowrap;color:{{ c.fg }}">{{ c.name }}</span>
+      </span>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    <sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+      <span class="mtap" onClick="{{ k.onClick }}" style="height:46px;border-radius:14px;background:#232532;border:1px solid #2e3143;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:400;color:#e4e7f5;cursor:pointer;font-feature-settings:'tnum'">{{ k.label }}</span>
+    </sc-for>
+  </div>
+
+  <div class="mtap" onClick="{{ saveExpense }}" style="margin-top:12px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;background:{{ saveBg }};border:1px solid {{ saveBorder }}">
+    <i class="ph-fill ph-check-circle" style="font-size:17px;color:{{ saveFg }}"></i>
+    <span style="font-size:14px;font-weight:500;color:{{ saveFg }}">{{ saveLabel }}</span>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDaySheet }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:31;border-radius:26px 26px 0 0;background:#1c1e2c;border-top:1px solid #343751;box-shadow:0 -24px 60px rgba(0,0,0,.5);animation:mSheet .34s cubic-bezier(.2,.85,.3,1);padding:10px 18px 22px;max-height:70%">
+  <div style="width:38px;height:4px;border-radius:999px;background:#3f424d;margin:0 auto 14px"></div>
+  <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:14px">
+    <span style="display:flex;flex-direction:column;gap:3px">
+      <span style="font-size:16px;font-weight:500">{{ dayTitle }}</span>
+      <span style="font-size:11.5px;color:#75798c">{{ dayCount }}</span>
+    </span>
+    <span style="font-size:20px;font-weight:500;font-feature-settings:'tnum';color:{{ dayColor }}">{{ dayTotal }}</span>
+  </div>
+  <div class="mscroll" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column">
+    <sc-for list="{{ dayRows }}" as="r" hint-placeholder-count="3">
+      <span style="display:flex;align-items:center;gap:12px;padding:10px 0">
+        <span style="width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ r.tint }}"><i class="ph-fill {{ r.icon }}" style="font-size:16px;color:{{ r.color }}"></i></span>
+        <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:13px;font-weight:500">{{ r.title }}</span>
+          <span style="font-size:11px;color:#75798c">{{ r.sub }}</span>
+        </span>
+        <span style="font-size:13.5px;font-feature-settings:'tnum'">{{ r.amount }}</span>
+      </span>
+    </sc-for>
+  </div>
+  <div class="mtap" onClick="{{ addOnDay }}" style="margin-top:12px;height:48px;border-radius:16px;border:1px solid #5d5294;background:rgba(145,132,217,.10);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><i class="ph ph-plus" style="font-size:15px;color:#b5abfc"></i><span style="font-size:13.5px;color:#d2cefd">Add to this day</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGoalSheet }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:31;border-radius:26px 26px 0 0;background:#1c1e2c;border-top:1px solid #343751;box-shadow:0 -24px 60px rgba(0,0,0,.5);animation:mSheet .34s cubic-bezier(.2,.85,.3,1);padding:10px 18px 22px">
+  <div style="width:38px;height:4px;border-radius:999px;background:#3f424d;margin:0 auto 14px"></div>
+  <span style="font-size:16px;font-weight:500">{{ goalSheetTitle }}</span>
+  <div style="display:flex;align-items:baseline;justify-content:center;gap:3px;padding:20px 0 8px">
+    <span style="font-size:22px;color:#75798c;font-weight:300">{{ symbol }}</span>
+    <span style="font-size:46px;font-weight:500;letter-spacing:-.03em;font-feature-settings:'tnum';color:{{ amountColor }}">{{ amountDisplay }}</span>
+  </div>
+  <div style="display:flex;justify-content:center;gap:8px;padding-bottom:16px">
+    <sc-for list="{{ quickAmounts }}" as="q" hint-placeholder-count="4">
+      <span class="mtap" onClick="{{ q.onClick }}" style="padding:6px 13px;border-radius:999px;background:#252838;border:1px solid #33364a;font-size:12px;color:#cfd3e5;cursor:pointer">{{ q.label }}</span>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    <sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+      <span class="mtap" onClick="{{ k.onClick }}" style="height:44px;border-radius:14px;background:#232532;border:1px solid #2e3143;display:flex;align-items:center;justify-content:center;font-size:18px;color:#e4e7f5;cursor:pointer">{{ k.label }}</span>
+    </sc-for>
+  </div>
+  <div class="mtap" onClick="{{ saveFunds }}" style="margin-top:12px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;background:{{ saveBg }};border:1px solid {{ saveBorder }}">
+    <i class="ph-fill ph-piggy-bank" style="font-size:18px;color:{{ saveFg }}"></i>
+    <span style="font-size:14px;font-weight:500;color:{{ saveFg }}">Move to goal</span>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:20px;right:20px;bottom:96px;z-index:40;padding:13px 16px;border-radius:14px;background:#2b2741;border:1px solid #4a4370;display:flex;align-items:center;gap:10px;animation:mPop .3s cubic-bezier(.2,.85,.3,1)">
+  <i class="ph-fill ph-check-circle" style="font-size:17px;color:#b5abfc"></i>
+  <span style="font-size:12.5px;color:#e7e5fe">{{ toastText }}</span>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:470,&quot;height&quot;:980},&quot;currencySymbol&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;$&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;heatStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;semantic&quot;,&quot;mono&quot;],&quot;default&quot;:&quot;semantic&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGlow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const CATS = [
+  { id: 1, name: 'Groceries',  icon: 'ph-shopping-cart', color: '#5FC49E', budget: 420, period: 'monthly' },
+  { id: 2, name: 'Dining',     icon: 'ph-fork-knife',    color: '#E0A15C', budget: 220, period: 'monthly' },
+  { id: 3, name: 'Transport',  icon: 'ph-car-profile',   color: '#8391F5', budget: 140, period: 'monthly' },
+  { id: 4, name: 'Home',       icon: 'ph-house',         color: '#A78BFA', budget: null, period: null },
+  { id: 5, name: 'Utilities',  icon: 'ph-lightning',     color: '#D6C070', budget: 180, period: 'monthly' },
+  { id: 6, name: 'Health',     icon: 'ph-first-aid-kit', color: '#E0787C', budget: 90,  period: 'monthly' },
+  { id: 7, name: 'Fun',        icon: 'ph-film-slate',    color: '#5FC2CE', budget: 60,  period: 'weekly' },
+  { id: 8, name: 'Shopping',   icon: 'ph-tag',           color: '#E07BB0', budget: 200, period: 'monthly' },
+];
+
+const TODAY = '2026-08-14';
+const NOTES = {
+  1: ['Weekly shop', 'Corner market', 'Bakery'],
+  2: ['Lunch with Sam', 'Ramen', 'Coffee'],
+  3: ['Metro top-up', 'Fuel', 'Taxi home'],
+  4: ['Hardware store', 'Cleaning'],
+  5: ['Electricity', 'Internet'],
+  6: ['Pharmacy', 'Dentist'],
+  7: ['Cinema', 'Concert ticket'],
+  8: ['Sneakers', 'Headphones', 'Gift'],
+};
+
+function seed() {
+  const out = [];
+  let id = 1;
+  const plan = [
+    [1, 1, 62.4], [1, 2, 14.5], [2, 3, 28], [3, 1, 41.9], [3, 8, 89], [4, 2, 22.5],
+    [5, 5, 74.2], [6, 1, 55.1], [6, 7, 18], [7, 2, 36.8], [8, 3, 12], [9, 1, 48.3],
+    [9, 6, 24], [10, 2, 19.5], [11, 1, 67.2], [11, 4, 33], [12, 8, 129], [12, 2, 41.6],
+    [13, 1, 39.4], [13, 3, 16.8], [13, 5, 52], [14, 2, 12.9], [14, 1, 26.5],
+  ];
+  for (const [day, cat, amount] of plan) {
+    const notes = NOTES[cat];
+    out.push({
+      id: id++,
+      amount,
+      categoryId: cat,
+      date: `2026-08-${String(day).padStart(2, '0')}`,
+      note: notes[(day + cat) % notes.length],
+    });
+  }
+  return out;
+}
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+class Component extends DCLogic {
+  state = {
+    tab: 'home',
+    settings: null,
+    sheet: null,
+    amount: '',
+    catId: 1,
+    day: null,
+    goalId: null,
+    period: 'month',
+    monthIdx: 7,
+    expenses: seed(),
+    goals: [
+      { id: 1, name: 'Sony WH-1000XM6', target: 399, saved: 312 },
+      { id: 2, name: 'Weekend in Lisbon', target: 850, saved: 850 },
+      { id: 3, name: 'New desk chair', target: 540, saved: 128 },
+    ],
+    toast: null,
+  };
+
+  cur(n) {
+    const s = this.props.currencySymbol || '$';
+    return s + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  cur0(n) {
+    const s = this.props.currencySymbol || '$';
+    return s + Math.round(n).toLocaleString('en-US');
+  }
+  catOf(id) { return CATS.find((c) => c.id === id); }
+  tint(hex) { return hex + '22'; }
+
+  heat(pct) {
+    if (this.props.heatStyle === 'mono') {
+      if (pct > 100) return '#d2cefd';
+      if (pct >= 90) return '#b5abfc';
+      if (pct >= 50) return '#9184d9';
+      return '#5d5294';
+    }
+    if (pct > 100) return '#d9848a';
+    if (pct >= 90) return '#d6b26a';
+    if (pct >= 50) return '#9184d9';
+    return '#5d5294';
+  }
+
+  monthTotal() {
+    return this.state.expenses.reduce((s, e) => s + e.amount, 0);
+  }
+  weekTotal() {
+    return this.state.expenses.filter((e) => e.date >= '2026-08-10').reduce((s, e) => s + e.amount, 0);
+  }
+  dayTotalFor(iso) {
+    return this.state.expenses.filter((e) => e.date === iso).reduce((s, e) => s + e.amount, 0);
+  }
+
+  flash(text) {
+    this.setState({ toast: text });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: null }), 2200);
+  }
+
+  press(k) {
+    const a = this.state.amount;
+    if (k === 'del') return this.setState({ amount: a.slice(0, -1) });
+    if (k === '.') return a.includes('.') ? null : this.setState({ amount: (a || '0') + '.' });
+    if (a.includes('.') && a.split('.')[1].length >= 2) return null;
+    if (a.length > 6) return null;
+    this.setState({ amount: a === '0' ? k : a + k });
+  }
+
+  save() {
+    const n = Number(this.state.amount);
+    if (!n || n <= 0) return this.flash('Enter an amount first');
+    const cat = this.catOf(this.state.catId);
+    const e = {
+      id: Date.now(),
+      amount: n,
+      categoryId: this.state.catId,
+      date: this.state.day || TODAY,
+      note: 'Added just now',
+    };
+    this.setState((s) => ({ expenses: [...s.expenses, e], sheet: null, amount: '' }));
+    this.flash(`${this.cur(n)} logged to ${cat.name}`);
+  }
+
+  fund() {
+    const n = Number(this.state.amount);
+    if (!n || n <= 0) return this.flash('Enter an amount first');
+    this.setState((s) => ({
+      goals: s.goals.map((g) => (g.id === s.goalId ? { ...g, saved: Math.min(g.target, g.saved + n) } : g)),
+      sheet: null,
+      amount: '',
+    }));
+    this.flash(`${this.cur(n)} moved to your goal`);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const income = 4200;
+    const fixed = 1450 + 11 + 39;
+    const monthSpend = this.monthTotal();
+    const goalsSaved = s.goals.reduce((a, g) => a + g.saved, 0);
+    const balance = income - fixed - monthSpend;
+    const whole = Math.floor(Math.abs(balance));
+    const cents = Math.round((Math.abs(balance) - whole) * 100);
+    const dailyTarget = (income - fixed) / 31;
+
+    const todaySpend = this.dayTotalFor(TODAY);
+    const weekSpend = this.weekTotal();
+    const dayPct = (todaySpend / dailyTarget) * 100;
+    const weekPct = (weekSpend / (dailyTarget * 7)) * 100;
+
+    const bar = (label, spend, target) => {
+      const pct = (spend / target) * 100;
+      const c = this.heat(pct);
+      return {
+        label,
+        value: this.cur0(spend),
+        target: this.cur0(target),
+        pct: Math.min(100, pct).toFixed(1),
+        color: c,
+        glow: c + '55',
+      };
+    };
+
+    const sorted = [...s.expenses].sort((a, b) => (b.date === a.date ? b.id - a.id : b.date.localeCompare(a.date)));
+    const rowOf = (e) => {
+      const c = this.catOf(e.categoryId);
+      return {
+        id: e.id,
+        icon: c.icon,
+        color: c.color,
+        tint: this.tint(c.color),
+        title: c.name,
+        sub: e.note + ' · ' + (e.date === TODAY ? 'Today' : e.date.slice(8) + ' Aug'),
+        amount: '-' + this.cur(e.amount),
+        onClick: () => this.setState({ day: e.date, sheet: 'day' }),
+      };
+    };
+
+    // heatmap for August 2026 (Aug 1 2026 is a Saturday)
+    const lead = 6;
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push({ key: 'b' + i, day: '', bg: 'transparent', border: 'transparent', fg: 'transparent', dot: 'transparent', onClick: () => {} });
+    for (let d = 1; d <= 31; d++) {
+      const iso = `2026-08-${String(d).padStart(2, '0')}`;
+      const total = this.dayTotalFor(iso);
+      const pct = (total / dailyTarget) * 100;
+      const has = total > 0;
+      const c = this.heat(pct);
+      cells.push({
+        key: iso,
+        day: String(d),
+        bg: has ? c + (pct >= 90 ? '3d' : '26') : '#1a1c2a',
+        border: iso === TODAY ? '#9184d9' : has ? c + '3a' : '#232535',
+        fg: has ? '#e4e7f5' : '#4d5162',
+        dot: has ? c : 'transparent',
+        onClick: () => this.setState({ day: iso, sheet: 'day' }),
+      });
+    }
+
+    const periodDiv = s.period === 'week' ? 7 / 31 : 1;
+    const catSpend = CATS.map((c) => {
+      const spent = s.expenses
+        .filter((e) => e.categoryId === c.id && (s.period === 'month' || e.date >= '2026-08-10'))
+        .reduce((a, e) => a + e.amount, 0);
+      const budget = c.budget === null ? null : c.budget * (s.period === 'week' && c.period === 'monthly' ? 7 / 31 : 1);
+      const pct = budget ? (spent / budget) * 100 : 0;
+      return { c, spent, budget, pct };
+    }).sort((a, b) => b.spent - a.spent);
+
+    const periodSpendN = catSpend.reduce((a, x) => a + x.spent, 0);
+    const periodBudgetN = (income - fixed) * periodDiv;
+
+    const dayRows = s.expenses.filter((e) => e.date === s.day).map(rowOf);
+
+    const keys = ['1','2','3','4','5','6','7','8','9','.','0','del'].map((k) => ({
+      key: k,
+      label: k === 'del' ? '⌫' : k,
+      onClick: () => this.press(k),
+    }));
+
+    const settingsData = {
+      income: {
+        title: 'Income',
+        blurb: 'Money coming in. Fixed monthly income repeats automatically on the first of each month.',
+        addLabel: 'Add income',
+        rows: [
+          { key: 'i1', icon: 'ph-bank', color: '#5FC49E', title: 'Salary', sub: 'Fixed monthly · repeats 1 Aug', value: this.cur0(4200) },
+          { key: 'i2', icon: 'ph-gift', color: '#E0A15C', title: 'Freelance bonus', sub: 'One-off · 6 Aug', value: this.cur0(320) },
+        ],
+      },
+      categories: {
+        title: 'Categories',
+        blurb: 'Each category carries its own limit. Spending heat on Home and History reads from these.',
+        addLabel: 'New category',
+        rows: CATS.map((c) => ({
+          key: 'c' + c.id,
+          icon: c.icon,
+          color: c.color,
+          title: c.name,
+          sub: c.budget === null ? 'No limit' : `${this.cur0(c.budget)} / ${c.period}`,
+          value: '',
+        })),
+      },
+      recurring: {
+        title: 'Recurring',
+        blurb: 'Payments that post themselves. They are deducted from your free balance before you spend a cent.',
+        addLabel: 'Add recurring payment',
+        rows: [
+          { key: 'r1', icon: 'ph-house', color: '#A78BFA', title: 'Rent', sub: 'Monthly · next 1 Sep', value: this.cur0(1450) },
+          { key: 'r2', icon: 'ph-music-notes', color: '#5FC2CE', title: 'Spotify', sub: 'Monthly · next 22 Aug', value: this.cur0(11) },
+          { key: 'r3', icon: 'ph-barbell', color: '#E0787C', title: 'Gym', sub: 'Monthly · next 3 Sep', value: this.cur0(39) },
+        ],
+      },
+      alerts: {
+        title: 'Alerts',
+        blurb: 'Get a nudge when a category crosses a share of its limit.',
+        addLabel: 'New alert',
+        rows: [
+          { key: 'a1', icon: 'ph-bell-simple', color: '#9184d9', title: 'Overall', sub: 'Whole month budget', value: '80%' },
+          { key: 'a2', icon: 'ph-fork-knife', color: '#E0A15C', title: 'Dining', sub: 'Monthly limit', value: '75%' },
+        ],
+      },
+      dev: {
+        title: 'Developer',
+        blurb: 'Move the app clock to test recurring materialisation without waiting for real dates.',
+        addLabel: 'Run recurring check',
+        rows: [
+          { key: 'd1', icon: 'ph-clock', color: '#8391F5', title: 'App clock', sub: 'Overrides today for all screens', value: '14 Aug' },
+          { key: 'd2', icon: 'ph-database', color: '#5FC49E', title: 'Local database', sub: '23 expenses · 3 goals', value: 'OK' },
+        ],
+      },
+    };
+    const page = s.settings && s.settings !== 'hub' ? settingsData[s.settings] : null;
+
+    const tabDef = (id, label, icon) => ({
+      key: id,
+      label,
+      icon: (s.tab === id ? 'ph-fill ' : 'ph ') + icon,
+      color: s.tab === id ? '#d2cefd' : '#6b6f82',
+      onClick: () => this.setState({ tab: id }),
+    });
+
+    const amountShown = s.amount === '' ? '0' : s.amount;
+
+    return {
+      symbol: this.props.currencySymbol || '$',
+      isHome: s.tab === 'home', isHistory: s.tab === 'history', isInsights: s.tab === 'insights', isGoals: s.tab === 'goals',
+      balanceWhole: whole.toLocaleString('en-US'),
+      balanceCents: String(cents).padStart(2, '0'),
+      monthSpendLabel: this.cur0(monthSpend),
+      daysLeft: 17,
+      bars: [bar('Today', todaySpend, dailyTarget), bar('This week', weekSpend, dailyTarget * 7)],
+      catChips: CATS.slice(0, 6).map((c) => ({
+        key: c.id, name: c.name, icon: c.icon, color: c.color, tint: this.tint(c.color),
+        onClick: () => this.setState({ sheet: 'add', catId: c.id, amount: '', day: null }),
+      })),
+      recent: sorted.slice(0, 6).map(rowOf),
+      monthList: sorted.map(rowOf),
+      goHistory: () => this.setState({ tab: 'history' }),
+
+      monthLabel: MONTHS[s.monthIdx] + ' 2026',
+      prevMonth: () => this.setState({ monthIdx: (s.monthIdx + 11) % 12 }),
+      nextMonth: () => this.setState({ monthIdx: (s.monthIdx + 1) % 12 }),
+      weekdays: ['S','M','T','W','T','F','S'].map((l, i) => ({ key: i, l })),
+      cells,
+      legend: ['#1a1c2a', '#5d5294', '#9184d9', this.heat(120)].map((c, i) => ({ key: i, c })),
+      monthStats: [
+        { key: 1, label: 'Spent', value: this.cur0(monthSpend), color: '#e9e9ed' },
+        { key: 2, label: 'Avg / day', value: this.cur0(monthSpend / 14), color: '#e9e9ed' },
+        { key: 3, label: 'Over days', value: '3', color: '#d9848a' },
+      ],
+
+      periods: [
+        { key: 'week', label: 'Week', bg: s.period === 'week' ? '#2b2741' : 'transparent', fg: s.period === 'week' ? '#d2cefd' : '#75798c', onClick: () => this.setState({ period: 'week' }) },
+        { key: 'month', label: 'Month', bg: s.period === 'month' ? '#2b2741' : 'transparent', fg: s.period === 'month' ? '#d2cefd' : '#75798c', onClick: () => this.setState({ period: 'month' }) },
+      ],
+      periodLabel: s.period === 'week' ? 'This week' : 'This month',
+      periodSpend: this.cur0(periodSpendN),
+      periodBudget: this.cur0(periodBudgetN),
+      composition: catSpend.filter((x) => x.spent > 0).slice(0, 5).map((x) => ({
+        key: x.c.id, name: x.c.name, color: x.c.color, flex: Math.max(0.4, x.spent),
+      })),
+      insights: catSpend.map((x) => ({
+        key: x.c.id,
+        name: x.c.name,
+        icon: x.c.icon,
+        color: x.c.color,
+        tint: this.tint(x.c.color),
+        spent: this.cur0(x.spent),
+        of: x.budget ? '/ ' + this.cur0(x.budget) : '· no limit',
+        pct: x.budget ? Math.min(100, x.pct).toFixed(1) : '0',
+        bar: this.heat(x.pct),
+        pctLabel: x.budget ? Math.round(x.pct) + '%' : '—',
+        pctColor: x.budget && x.pct >= 90 ? '#d9848a' : '#75798c',
+      })),
+
+      goalsSaved: this.cur0(goalsSaved),
+      goalsCount: s.goals.length,
+      goals: s.goals.map((g) => {
+        const pct = Math.min(100, (g.saved / g.target) * 100);
+        const ready = g.saved >= g.target;
+        return {
+          key: g.id,
+          name: g.name,
+          saved: this.cur0(g.saved),
+          target: this.cur0(g.target),
+          pctLabel: Math.round(pct) + '%',
+          deg: (pct / 100) * 360,
+          ring: ready ? '#5FC49E' : '#9184d9',
+          bg: ready ? 'linear-gradient(150deg,#1f2a2b,#1b1d2b)' : '#1e2030',
+          border: ready ? '#33564d' : '#2b2e3d',
+          note: ready ? 'Ready to buy' : this.cur0(g.target - g.saved) + ' to go',
+          noteColor: ready ? '#7FD1AE' : '#5d6172',
+          onClick: () => this.setState({ sheet: 'goal', goalId: g.id, amount: '' }),
+        };
+      }),
+      openNewGoal: () => this.flash('New goal flow — next iteration'),
+
+      tabsLeft: [tabDef('home', 'Home', 'ph-house'), tabDef('history', 'History', 'ph-calendar-blank')],
+      tabsRight: [tabDef('insights', 'Insights', 'ph-chart-donut'), tabDef('goals', 'Goals', 'ph-piggy-bank')],
+      openAdd: () => this.setState({ sheet: 'add', amount: '', day: null }),
+
+      openSettings: () => this.setState({ settings: 'hub' }),
+      openSearch: () => this.flash('3 alerts armed · none tripped today'),
+      settingsOpen: s.settings !== null,
+      isSettingsHub: s.settings === 'hub',
+      isSettingsPage: s.settings !== null && s.settings !== 'hub',
+      settingsTitle: page ? page.title : 'Settings',
+      settingsBack: () => this.setState({ settings: s.settings === 'hub' ? null : 'hub' }),
+      incomeLabel: this.cur0(income),
+      fixedLabel: this.cur0(fixed),
+      settingsCards: [
+        { key: 'income', title: 'Income', sub: 'Salary, bonuses, repeats', icon: 'ph-bank', color: '#5FC49E', count: '2', onClick: () => this.setState({ settings: 'income' }) },
+        { key: 'categories', title: 'Categories', sub: 'Limits, icons and colours', icon: 'ph-squares-four', color: '#A78BFA', count: String(CATS.length), onClick: () => this.setState({ settings: 'categories' }) },
+        { key: 'recurring', title: 'Recurring payments', sub: 'Rent, subscriptions, bills', icon: 'ph-arrows-clockwise', color: '#8391F5', count: '3', onClick: () => this.setState({ settings: 'recurring' }) },
+        { key: 'alerts', title: 'Alerts', sub: 'Threshold nudges per category', icon: 'ph-bell-simple', color: '#E0A15C', count: '2', onClick: () => this.setState({ settings: 'alerts' }) },
+        { key: 'dev', title: 'Developer tools', sub: 'App clock, recurring check', icon: 'ph-wrench', color: '#75798c', count: '', onClick: () => this.setState({ settings: 'dev' }) },
+      ].map((x) => ({ ...x, tint: this.tint(x.color) })),
+      pageBlurb: page ? page.blurb : '',
+      pageAddLabel: page ? page.addLabel : '',
+      pageAdd: () => this.flash('Editor sheet — next iteration'),
+      pageRows: page
+        ? page.rows.map((r) => ({ ...r, tint: this.tint(r.color), valueColor: '#cfd3e5', onDelete: () => this.flash('Removed ' + r.title) }))
+        : [],
+
+      sheetOpen: s.sheet !== null,
+      isAddSheet: s.sheet === 'add',
+      isDaySheet: s.sheet === 'day',
+      isGoalSheet: s.sheet === 'goal',
+      closeSheet: () => this.setState({ sheet: null, amount: '' }),
+      amountDisplay: amountShown,
+      amountColor: s.amount === '' ? '#4d5162' : '#f3f5fe',
+      quickAmounts: [5, 10, 20, 50].map((v) => ({
+        key: v,
+        label: '+' + v,
+        onClick: () => this.setState({ amount: String((Number(this.state.amount) || 0) + v) }),
+      })),
+      sheetCats: CATS.map((c) => ({
+        key: c.id, name: c.name, icon: c.icon, color: c.color, tint: this.tint(c.color),
+        bg: s.catId === c.id ? '#2b2741' : '#232532',
+        border: s.catId === c.id ? '#5d5294' : '#2f3243',
+        fg: s.catId === c.id ? '#e7e5fe' : '#9397ab',
+        onClick: () => this.setState({ catId: c.id }),
+      })),
+      keys,
+      saveExpense: () => this.save(),
+      saveFunds: () => this.fund(),
+      saveLabel: s.day ? 'Save to ' + s.day.slice(8) + ' Aug' : 'Save expense',
+      saveBg: s.amount ? 'rgba(145,132,217,.14)' : '#212433',
+      saveBorder: s.amount ? '#6d61a8' : '#2e3143',
+      saveFg: s.amount ? '#d2cefd' : '#5d6172',
+
+      dayTitle: s.day ? Number(s.day.slice(8)) + ' August 2026' : '',
+      dayCount: dayRows.length + (dayRows.length === 1 ? ' expense' : ' expenses'),
+      dayTotal: this.cur(this.dayTotalFor(s.day || '')),
+      dayColor: this.heat((this.dayTotalFor(s.day || '') / dailyTarget) * 100),
+      dayRows,
+      addOnDay: () => this.setState({ sheet: 'add', amount: '' }),
+
+      goalSheetTitle: s.goalId ? 'Add funds — ' + (s.goals.find((g) => g.id === s.goalId) || {}).name : '',
+      toastVisible: s.toast !== null,
+      toastText: s.toast || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

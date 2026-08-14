@@ -1,4 +1,4 @@
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 import type { Expense, PiggyBank, PiggyBankTransaction } from '../db/schema';
 import { getPiggyBank, setPiggyBankStatus, setPiggyBankTargetPrice } from '../repositories/piggyBanks';
 import { getSavedAmount, recordTransaction } from '../repositories/piggyBankTransactions';

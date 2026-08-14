@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { incomeEntries, type IncomeEntry, type NewIncomeEntry } from '../db/schema';
-import type { AppDb } from '../db/testDb';
+import type { AppDb } from '../db/types';
 
 export async function logIncome(db: AppDb, input: Omit<NewIncomeEntry, 'id'>): Promise<IncomeEntry> {
   const [row] = await db.insert(incomeEntries).values(input).returning();
