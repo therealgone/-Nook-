@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useDb } from '../../components/db-provider';
+import { CalendarPicker } from '../../components/calendar-picker';
 import { SettingsHeader } from '../../components/settings-header';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { Button } from '../../components/ui/Button';
@@ -18,7 +19,7 @@ import { createRecurringPayment, deleteRecurringPayment, listRecurringPayments, 
 import { createThreshold, deleteThreshold, listAllThresholds } from '../../src/repositories/notificationThresholds';
 import { advanceDate } from '../../src/domain/recurrence';
 import type { Category, IncomeEntry, NotificationThreshold, RecurringIncome, RecurringPayment } from '../../src/db/schema';
-import { colors, fonts, spacing } from '../../constants/theme';
+import { colors, fonts, radius, spacing } from '../../constants/theme';
 import { formatCurrency, todayIso } from '../../utils/format';
 
 const SECTION_META: Record<string, { title: string; blurb: string }> = {
@@ -83,13 +84,25 @@ function AddButton({ label, onPress }: { label: string; onPress: () => void }) {
   return <Button label={`+ ${label}`} variant="dashed" onPress={onPress} />;
 }
 
+function DateField({ date, onPress }: { date: string; onPress: () => void }) {
+  return (
+    <Pressable style={styles.dateField} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Date: ${date}`}>
+      <Text style={styles.dateFieldLabel}>Date</Text>
+      <Text style={styles.dateFieldValue}>{date}</Text>
+    </Pressable>
+  );
+}
+
 function IncomeSection() {
   const db = useDb();
   const [income, setIncome] = useState<IncomeEntry[]>([]);
   const [schedules, setSchedules] = useState<RecurringIncome[]>([]);
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
+  const [label, setLabel] = useState('');
   const [type, setType] = useState<IncomeEntry['type']>('fixed_monthly');
+  const [date, setDate] = useState(todayIso());
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -102,7 +115,9 @@ function IncomeSection() {
 
   function openSheet() {
     setAmount('');
+    setLabel('');
     setType('fixed_monthly');
+    setDate(todayIso());
     setError(null);
     setOpen(true);
   }
@@ -113,10 +128,10 @@ function IncomeSection() {
       setError('Enter a valid amount');
       return;
     }
-    const today = todayIso();
-    await logIncome(db, { amount: parsed, type, date: today, note: null });
+    const note = label.trim() || null;
+    await logIncome(db, { amount: parsed, type, date, note });
     if (type === 'fixed_monthly') {
-      await createRecurringIncome(db, { amount: parsed, frequency: 'monthly', nextDueDate: advanceDate(today, 'monthly'), note: null });
+      await createRecurringIncome(db, { amount: parsed, frequency: 'monthly', nextDueDate: advanceDate(date, 'monthly'), note });
     }
     setOpen(false);
     load();
@@ -129,8 +144,8 @@ function IncomeSection() {
           key={entry.id}
           icon="cash"
           swatchColor={colors.positive}
-          title={entry.type.replace('_', ' ')}
-          subtitle={entry.date}
+          title={entry.note || entry.type.replace('_', ' ')}
+          subtitle={entry.note ? `${entry.type.replace('_', ' ')} • ${entry.date}` : entry.date}
           value={formatCurrency(entry.amount)}
           onDelete={() => deleteIncome(db, entry.id).then(load)}
         />
@@ -152,18 +167,29 @@ function IncomeSection() {
 
       <BottomSheet visible={open} onClose={() => setOpen(false)}>
         <SheetTitle>Add income</SheetTitle>
-        <TextField placeholder="Amount" keyboardType="decimal-pad" value={amount} onChangeText={setAmount} autoFocus />
+        <TextField placeholder="Label (e.g. Salary)" value={label} onChangeText={setLabel} autoFocus />
+        <TextField placeholder="Amount" keyboardType="decimal-pad" value={amount} onChangeText={setAmount} />
         <View style={styles.chipRow}>
           {(['fixed_monthly', 'bonus', 'adjustment'] as const).map((t) => (
             <Chip key={t} label={t.replace('_', ' ')} selected={type === t} onPress={() => setType(t)} />
           ))}
         </View>
+        <DateField date={date} onPress={() => setCalendarOpen(true)} />
         {error && <Body style={{ color: colors.danger }}>{error}</Body>}
         <View style={styles.sheetActions}>
           <Button label="Cancel" variant="secondary" onPress={() => setOpen(false)} />
           <Button label="Save" onPress={save} />
         </View>
       </BottomSheet>
+      <CalendarPicker
+        visible={calendarOpen}
+        initialDate={date}
+        onSelect={(iso) => {
+          setDate(iso);
+          setCalendarOpen(false);
+        }}
+        onClose={() => setCalendarOpen(false)}
+      />
     </>
   );
 }
@@ -254,6 +280,8 @@ function RecurringSection() {
   const [label, setLabel] = useState('');
   const [amount, setAmount] = useState('');
   const [frequency, setFrequency] = useState<RecurringPayment['frequency']>('monthly');
+  const [nextDueDate, setNextDueDate] = useState(todayIso());
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<RecurringPayment | null>(null);
   const [editAmount, setEditAmount] = useState('');
@@ -267,6 +295,7 @@ function RecurringSection() {
     setLabel('');
     setAmount('');
     setFrequency('monthly');
+    setNextDueDate(todayIso());
     setError(null);
     setOpen(true);
   }
@@ -281,7 +310,7 @@ function RecurringSection() {
       setError('Enter a valid amount');
       return;
     }
-    await createRecurringPayment(db, { label: label.trim(), amount: parsed, categoryId: null, frequency, nextDueDate: todayIso() });
+    await createRecurringPayment(db, { label: label.trim(), amount: parsed, categoryId: null, frequency, nextDueDate });
     setOpen(false);
     load();
   }
@@ -338,12 +367,22 @@ function RecurringSection() {
             <Chip key={f} label={f} selected={frequency === f} onPress={() => setFrequency(f)} />
           ))}
         </View>
+        <DateField date={nextDueDate} onPress={() => setCalendarOpen(true)} />
         {error && <Body style={{ color: colors.danger }}>{error}</Body>}
         <View style={styles.sheetActions}>
           <Button label="Cancel" variant="secondary" onPress={() => setOpen(false)} />
           <Button label="Save" onPress={save} />
         </View>
       </BottomSheet>
+      <CalendarPicker
+        visible={calendarOpen}
+        initialDate={nextDueDate}
+        onSelect={(iso) => {
+          setNextDueDate(iso);
+          setCalendarOpen(false);
+        }}
+        onClose={() => setCalendarOpen(false)}
+      />
 
       <BottomSheet visible={!!editing} onClose={() => setEditing(null)}>
         <SheetTitle>Edit {editing?.label}</SheetTitle>
@@ -448,4 +487,17 @@ const styles = StyleSheet.create({
   rowValue: { fontFamily: fonts.regular, fontSize: 13, color: '#cfd3e5', fontVariant: ['tabular-nums'] },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   sheetActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12 },
+  dateField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.hairlineStrong,
+    borderRadius: radius.lg,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  dateFieldLabel: { fontFamily: fonts.regular, fontSize: 12.5, color: colors.inkMuted },
+  dateFieldValue: { fontFamily: fonts.medium, fontSize: 13, color: colors.ink, fontVariant: ['tabular-nums'] },
 });
