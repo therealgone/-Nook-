@@ -72,6 +72,7 @@ export function PeriodAlertModal() {
       }
 
       const banks = await listPiggyBanks(db, 'active');
+      if (cancelled) return;
       const borrowActions: DialogAction[] = banks.map((bank) => ({
         label: `Borrow ${formatCurrency(remaining)} from ${bank.productName}`,
         variant: 'accent',
