@@ -16,6 +16,8 @@ import { DbProvider } from '../components/db-provider';
 import { AddExpenseSheetProvider } from '../components/add-expense-sheet-context';
 import { AddExpenseSheet } from '../components/add-expense-sheet';
 import { ToastProvider } from '../components/toast-context';
+import { PeriodAlertsProvider } from '../components/period-alerts-context';
+import { PeriodAlertModal } from '../components/period-alert-modal';
 import { colors } from '../constants/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -44,13 +46,16 @@ export default function RootLayout() {
       <StatusBar style="light" />
       <DbProvider>
         <ToastProvider>
-          <AddExpenseSheetProvider>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.screenBg } }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="settings" />
-            </Stack>
-            <AddExpenseSheet />
-          </AddExpenseSheetProvider>
+          <PeriodAlertsProvider>
+            <AddExpenseSheetProvider>
+              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.screenBg } }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="settings" />
+              </Stack>
+              <AddExpenseSheet />
+              <PeriodAlertModal />
+            </AddExpenseSheetProvider>
+          </PeriodAlertsProvider>
         </ToastProvider>
       </DbProvider>
     </View>
