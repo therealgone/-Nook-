@@ -3,6 +3,7 @@ import { logIncome } from '../../repositories/income';
 import { logExpense } from '../../repositories/expenses';
 import { createPiggyBank } from '../../repositories/piggyBanks';
 import { recordTransaction } from '../../repositories/piggyBankTransactions';
+import { recordGeneralSavingsTransaction } from '../../repositories/generalSavings';
 import { calculateFreeBalance } from '../freeBalance';
 
 test('Free Balance = income - expenses - active piggy bank savings', async () => {
@@ -23,4 +24,13 @@ test('a cancelled piggy bank does not lock funds out of Free Balance', async () 
   await recordTransaction(db, { piggyBankId: bank.id, type: 'withdrawal', source: 'cancel_refund', amount: 200 });
 
   expect(await calculateFreeBalance(db)).toBe(1000);
+});
+
+test('a general Piggy Bank deposit reduces Free Balance by the deposited amount', async () => {
+  const db = createTestDb();
+  await logIncome(db, { amount: 4500, type: 'fixed_monthly', date: '2026-08-01', note: null });
+  await logExpense(db, { amount: 800, categoryId: null, date: '2026-08-05', note: null, isRecurring: false });
+  await recordGeneralSavingsTransaction(db, { type: 'deposit', source: 'period_surplus', amount: 300 });
+
+  expect(await calculateFreeBalance(db)).toBe(4500 - 800 - 300);
 });

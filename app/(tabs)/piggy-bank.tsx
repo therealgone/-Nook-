@@ -10,11 +10,13 @@ import { ProgressRing } from '../../components/progress-ring';
 import { AmountDisplay, Keypad, QuickAmountRow, addQuickAmount } from '../../components/amount-keypad';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 import { ConfirmDialog, type DialogAction } from '../../components/ui/ConfirmDialog';
 import { TextField } from '../../components/ui/TextField';
 import { Body, SheetTitle } from '../../components/ui/Text';
 import { createPiggyBank, listPiggyBanks } from '../../src/repositories/piggyBanks';
 import { recordTransaction } from '../../src/repositories/piggyBankTransactions';
+import { getGeneralSavingsBalance } from '../../src/repositories/generalSavings';
 import { cancelPiggyBank, getProgress, markAsPurchased } from '../../src/domain/piggyBankLifecycle';
 import type { PiggyBank } from '../../src/db/schema';
 import { colors, fonts, radius, spacing } from '../../constants/theme';
@@ -28,6 +30,7 @@ export default function PiggyBankScreen() {
   const showToast = useToast();
   const [banks, setBanks] = useState<PiggyBank[]>([]);
   const [progress, setProgress] = useState<Record<number, Progress>>({});
+  const [generalBalance, setGeneralBalance] = useState(0);
   const [createVisible, setCreateVisible] = useState(false);
   const [productName, setProductName] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
@@ -41,6 +44,7 @@ export default function PiggyBankScreen() {
     setBanks(active);
     const entries = await Promise.all(active.map(async (b) => [b.id, await getProgress(db, b.id)] as const));
     setProgress(Object.fromEntries(entries));
+    setGeneralBalance(await getGeneralSavingsBalance(db));
   }, [db]);
 
   useFocusEffect(
@@ -129,6 +133,12 @@ export default function PiggyBankScreen() {
         data={banks}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ gap: spacing.md, padding: spacing.lg, paddingBottom: 120 }}
+        ListHeaderComponent={
+          <Card style={styles.generalCard}>
+            <Text style={styles.generalLabel}>Piggy Bank</Text>
+            <Text style={styles.generalAmount}>{formatCurrency(generalBalance)}</Text>
+          </Card>
+        }
         ListEmptyComponent={<Body muted>No savings goals yet.</Body>}
         renderItem={({ item }) => {
           const p = progress[item.id];
@@ -229,6 +239,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   cardComplete: { borderColor: '#33564d' },
+  generalCard: { marginBottom: spacing.md },
+  generalLabel: { fontFamily: fonts.regular, fontSize: 11.5, color: colors.inkMuted },
+  generalAmount: { fontFamily: fonts.medium, fontSize: 20, letterSpacing: -0.4, color: colors.ink, fontVariant: ['tabular-nums'], marginTop: 2 },
   cardBody: { flex: 1, gap: 2 },
   goalName: { fontFamily: fonts.medium, fontSize: 14.5, color: colors.ink },
   goalAmount: { fontFamily: fonts.medium, fontSize: 12, color: colors.ink, fontVariant: ['tabular-nums'] },
