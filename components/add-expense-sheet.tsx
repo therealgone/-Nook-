@@ -46,9 +46,9 @@ export function AddExpenseSheet() {
       note: null,
       isRecurring: false,
     });
-    await refreshPeriodAlerts();
     close();
     bumpRefresh();
+    await refreshPeriodAlerts();
     showToast(`${formatCurrency(parsed)} logged to ${category?.name ?? 'category'}`);
   }
 

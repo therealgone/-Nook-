@@ -135,9 +135,9 @@ function IncomeSection() {
     if (type === 'fixed_monthly') {
       await createRecurringIncome(db, { amount: parsed, frequency: 'monthly', nextDueDate: advanceDate(date, 'monthly'), note });
     }
-    await refreshPeriodAlerts();
     setOpen(false);
     load();
+    await refreshPeriodAlerts();
   }
 
   return (
