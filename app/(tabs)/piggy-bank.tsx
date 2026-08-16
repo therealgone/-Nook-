@@ -15,9 +15,8 @@ import { ConfirmDialog, type DialogAction } from '../../components/ui/ConfirmDia
 import { TextField } from '../../components/ui/TextField';
 import { Body, SheetTitle } from '../../components/ui/Text';
 import { createPiggyBank, listPiggyBanks } from '../../src/repositories/piggyBanks';
-import { recordTransaction } from '../../src/repositories/piggyBankTransactions';
 import { getGeneralSavingsBalance } from '../../src/repositories/generalSavings';
-import { cancelPiggyBank, getProgress, markAsPurchased } from '../../src/domain/piggyBankLifecycle';
+import { cancelPiggyBank, fundGoal, getProgress, markAsPurchased } from '../../src/domain/piggyBankLifecycle';
 import type { PiggyBank } from '../../src/db/schema';
 import { colors, fonts, radius, spacing } from '../../constants/theme';
 import { formatCurrency, todayIso } from '../../utils/format';
@@ -34,10 +33,12 @@ export default function PiggyBankScreen() {
   const [createVisible, setCreateVisible] = useState(false);
   const [productName, setProductName] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
+  const [fundNowAmount, setFundNowAmount] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [fundingBank, setFundingBank] = useState<PiggyBank | null>(null);
   const [fundAmount, setFundAmount] = useState('');
   const [actionSheet, setActionSheet] = useState<{ bank: PiggyBank; actions: DialogAction[] } | null>(null);
+  const [fundConfirm, setFundConfirm] = useState<{ message: string; actions: DialogAction[] } | null>(null);
 
   const load = useCallback(async () => {
     const active = await listPiggyBanks(db, 'active');
@@ -58,6 +59,7 @@ export default function PiggyBankScreen() {
   function openCreate() {
     setProductName('');
     setTargetPrice('');
+    setFundNowAmount('');
     setError(null);
     setCreateVisible(true);
   }
@@ -72,9 +74,13 @@ export default function PiggyBankScreen() {
       setError('Enter a valid target price');
       return;
     }
-    await createPiggyBank(db, { productName: productName.trim(), targetPrice: price });
+    const bank = await createPiggyBank(db, { productName: productName.trim(), targetPrice: price });
     setCreateVisible(false);
     await load();
+    const fundNow = Number(fundNowAmount);
+    if (fundNowAmount && !Number.isNaN(fundNow) && fundNow > 0) {
+      await requestFunding(bank, fundNow);
+    }
   }
 
   function openFunding(bank: PiggyBank) {
@@ -82,14 +88,48 @@ export default function PiggyBankScreen() {
     setFundingBank(bank);
   }
 
+  async function commitFunding(bank: PiggyBank, amount: number) {
+    const { fromPiggyBank, fromMainBalance } = await fundGoal(db, bank.id, amount);
+    await load();
+    if (fromPiggyBank > 0 && fromMainBalance > 0) {
+      showToast(`${formatCurrency(fromPiggyBank)} from Piggy Bank, ${formatCurrency(fromMainBalance)} from main balance`);
+    } else if (fromPiggyBank > 0) {
+      showToast(`${formatCurrency(fromPiggyBank)} moved from Piggy Bank to ${bank.productName}`);
+    } else {
+      showToast(`${formatCurrency(fromMainBalance)} added to ${bank.productName}`);
+    }
+  }
+
+  async function requestFunding(bank: PiggyBank, amount: number) {
+    const piggyBankBalance = await getGeneralSavingsBalance(db);
+    if (amount > piggyBankBalance) {
+      const shortfall = amount - piggyBankBalance;
+      const message =
+        piggyBankBalance > 0
+          ? `Your Piggy Bank has ${formatCurrency(piggyBankBalance)} saved. ${formatCurrency(shortfall)} will come from your main balance instead. Continue?`
+          : `Your Piggy Bank is empty. ${formatCurrency(shortfall)} will come from your main balance instead. Continue?`;
+      setFundConfirm({
+        message,
+        actions: [
+          {
+            label: 'Continue',
+            variant: 'accent',
+            onPress: () => commitFunding(bank, amount),
+          },
+        ],
+      });
+      return;
+    }
+    await commitFunding(bank, amount);
+  }
+
   async function saveFunds() {
     if (!fundingBank) return;
     const amount = Number(fundAmount);
     if (!amount || Number.isNaN(amount) || amount <= 0) return;
-    await recordTransaction(db, { piggyBankId: fundingBank.id, type: 'deposit', source: 'manual', amount });
+    const bank = fundingBank;
     setFundingBank(null);
-    await load();
-    showToast(`${formatCurrency(amount)} moved to ${fundingBank.productName}`);
+    await requestFunding(bank, amount);
   }
 
   function onLongPressBank(bank: PiggyBank) {
@@ -184,6 +224,7 @@ export default function PiggyBankScreen() {
         <SheetTitle>New goal</SheetTitle>
         <TextField placeholder="Product name" value={productName} onChangeText={setProductName} />
         <TextField placeholder="Target price" keyboardType="decimal-pad" value={targetPrice} onChangeText={setTargetPrice} />
+        <TextField placeholder="Fund now (optional)" keyboardType="decimal-pad" value={fundNowAmount} onChangeText={setFundNowAmount} />
         {error && <Body style={{ color: colors.danger }}>{error}</Body>}
         <View style={styles.sheetActions}>
           <Button label="Cancel" variant="secondary" onPress={() => setCreateVisible(false)} />
@@ -213,6 +254,14 @@ export default function PiggyBankScreen() {
         title={actionSheet?.bank.productName ?? ''}
         actions={actionSheet?.actions ?? []}
         onDismiss={() => setActionSheet(null)}
+      />
+
+      <ConfirmDialog
+        visible={!!fundConfirm}
+        title="Going over your Piggy Bank"
+        message={fundConfirm?.message}
+        actions={fundConfirm?.actions ?? []}
+        onDismiss={() => setFundConfirm(null)}
       />
     </View>
   );

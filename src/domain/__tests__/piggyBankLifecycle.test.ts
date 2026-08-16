@@ -1,8 +1,9 @@
 import { createTestDb } from '../../db/testDb';
 import { createPiggyBank, getPiggyBank } from '../../repositories/piggyBanks';
 import { recordTransaction, getSavedAmount } from '../../repositories/piggyBankTransactions';
+import { recordGeneralSavingsTransaction, getGeneralSavingsBalance } from '../../repositories/generalSavings';
 import { calculateFreeBalance } from '../freeBalance';
-import { cancelPiggyBank, changeTargetPrice, markAsPurchased, getProgress } from '../piggyBankLifecycle';
+import { cancelPiggyBank, changeTargetPrice, markAsPurchased, getProgress, fundGoal } from '../piggyBankLifecycle';
 
 test('cancelling a goal refunds 100% of saved funds and marks it cancelled', async () => {
   const db = createTestDb();
@@ -61,4 +62,49 @@ test('marking an under-funded goal as purchased throws', async () => {
   const bank = await createPiggyBank(db, { productName: 'Headphones', targetPrice: 250 });
   await recordTransaction(db, { piggyBankId: bank.id, type: 'deposit', source: 'manual', amount: 100 });
   await expect(markAsPurchased(db, bank.id, '2026-08-13')).rejects.toThrow();
+});
+
+test('funding a goal fully from the Piggy Bank when it covers the whole amount', async () => {
+  const db = createTestDb();
+  const bank = await createPiggyBank(db, { productName: 'Headphones', targetPrice: 500 });
+  await recordGeneralSavingsTransaction(db, { type: 'deposit', source: 'period_surplus', amount: 5000 });
+
+  const result = await fundGoal(db, bank.id, 300);
+
+  expect(result).toEqual({ fromPiggyBank: 300, fromMainBalance: 0 });
+  expect(await getSavedAmount(db, bank.id)).toBe(300);
+  expect(await getGeneralSavingsBalance(db)).toBe(4700);
+});
+
+test('funding a goal beyond the Piggy Bank balance splits between the Piggy Bank and the main balance', async () => {
+  const db = createTestDb();
+  const bank = await createPiggyBank(db, { productName: 'Headphones', targetPrice: 500 });
+  await recordGeneralSavingsTransaction(db, { type: 'deposit', source: 'period_surplus', amount: 200 });
+
+  const result = await fundGoal(db, bank.id, 300);
+
+  expect(result).toEqual({ fromPiggyBank: 200, fromMainBalance: 100 });
+  expect(await getSavedAmount(db, bank.id)).toBe(300);
+  expect(await getGeneralSavingsBalance(db)).toBe(0);
+});
+
+test('funding a goal with an empty Piggy Bank comes entirely from the main balance', async () => {
+  const db = createTestDb();
+  const bank = await createPiggyBank(db, { productName: 'Headphones', targetPrice: 500 });
+
+  const result = await fundGoal(db, bank.id, 150);
+
+  expect(result).toEqual({ fromPiggyBank: 0, fromMainBalance: 150 });
+  expect(await getSavedAmount(db, bank.id)).toBe(150);
+});
+
+test('funding a goal from the Piggy Bank does not change overall Free Balance', async () => {
+  const db = createTestDb();
+  const bank = await createPiggyBank(db, { productName: 'Headphones', targetPrice: 500 });
+  await recordGeneralSavingsTransaction(db, { type: 'deposit', source: 'period_surplus', amount: 5000 });
+  const freeBalanceBefore = await calculateFreeBalance(db);
+
+  await fundGoal(db, bank.id, 300);
+
+  expect(await calculateFreeBalance(db)).toBe(freeBalanceBefore);
 });

@@ -2,6 +2,7 @@ import type { AppDb } from '../db/types';
 import type { Expense, PiggyBank, PiggyBankTransaction } from '../db/schema';
 import { getPiggyBank, setPiggyBankStatus, setPiggyBankTargetPrice } from '../repositories/piggyBanks';
 import { getSavedAmount, recordTransaction } from '../repositories/piggyBankTransactions';
+import { getGeneralSavingsBalance, recordGeneralSavingsTransaction } from '../repositories/generalSavings';
 import { logExpense } from '../repositories/expenses';
 
 async function requirePiggyBank(db: AppDb, id: number): Promise<PiggyBank> {
@@ -75,6 +76,43 @@ export async function markAsPurchased(
   });
 
   return { piggyBank, expense };
+}
+
+export async function fundGoal(
+  db: AppDb,
+  id: number,
+  amount: number,
+): Promise<{ fromPiggyBank: number; fromMainBalance: number }> {
+  await requirePiggyBank(db, id);
+  const piggyBankBalance = await getGeneralSavingsBalance(db);
+  const fromPiggyBank = Math.min(amount, piggyBankBalance);
+  const fromMainBalance = amount - fromPiggyBank;
+
+  if (fromPiggyBank > 0) {
+    await recordGeneralSavingsTransaction(db, {
+      type: 'withdrawal',
+      source: 'goal_funding',
+      amount: fromPiggyBank,
+      note: `Transferred to piggy bank ${id}`,
+    });
+    await recordTransaction(db, {
+      piggyBankId: id,
+      type: 'deposit',
+      source: 'piggy_bank_transfer',
+      amount: fromPiggyBank,
+    });
+  }
+
+  if (fromMainBalance > 0) {
+    await recordTransaction(db, {
+      piggyBankId: id,
+      type: 'deposit',
+      source: 'manual',
+      amount: fromMainBalance,
+    });
+  }
+
+  return { fromPiggyBank, fromMainBalance };
 }
 
 export async function getProgress(

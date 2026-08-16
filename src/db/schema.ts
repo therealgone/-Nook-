@@ -98,6 +98,7 @@ export const piggyBankTransactions = sqliteTable('piggy_bank_transactions', {
       'cancel_refund',
       'period_surplus',
       'period_deficit',
+      'piggy_bank_transfer',
     ],
   }).notNull(),
   amount: real('amount').notNull(),
@@ -124,7 +125,7 @@ export const generalSavingsTransactions = sqliteTable('general_savings_transacti
   id: integer('id').primaryKey({ autoIncrement: true }),
   type: text('type', { enum: ['deposit', 'withdrawal'] }).notNull(),
   source: text('source', {
-    enum: ['period_surplus', 'period_surplus_overflow', 'period_deficit'],
+    enum: ['period_surplus', 'period_surplus_overflow', 'period_deficit', 'goal_funding'],
   }).notNull(),
   amount: real('amount').notNull(),
   note: text('note'),
