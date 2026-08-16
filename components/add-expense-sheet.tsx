@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CheckCircleIcon, XIcon } from 'phosphor-react-native';
 import { useDb } from './db-provider';
 import { useAddExpenseSheet } from './add-expense-sheet-context';
+import { usePeriodAlerts } from './period-alerts-context';
 import { useToast } from './toast-context';
 import { BottomSheet } from './ui/BottomSheet';
 import { Chip } from './ui/Chip';
@@ -16,6 +17,7 @@ import { formatCurrency, todayIso } from '../utils/format';
 export function AddExpenseSheet() {
   const db = useDb();
   const { state, close, bumpRefresh } = useAddExpenseSheet();
+  const { refresh: refreshPeriodAlerts } = usePeriodAlerts();
   const showToast = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [amount, setAmount] = useState('');
@@ -44,6 +46,7 @@ export function AddExpenseSheet() {
       note: null,
       isRecurring: false,
     });
+    await refreshPeriodAlerts();
     close();
     bumpRefresh();
     showToast(`${formatCurrency(parsed)} logged to ${category?.name ?? 'category'}`);

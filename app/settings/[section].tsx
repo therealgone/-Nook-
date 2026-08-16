@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useDb } from '../../components/db-provider';
+import { usePeriodAlerts } from '../../components/period-alerts-context';
 import { CalendarPicker } from '../../components/calendar-picker';
 import { SettingsHeader } from '../../components/settings-header';
 import { BottomSheet } from '../../components/ui/BottomSheet';
@@ -95,6 +96,7 @@ function DateField({ date, onPress }: { date: string; onPress: () => void }) {
 
 function IncomeSection() {
   const db = useDb();
+  const { refresh: refreshPeriodAlerts } = usePeriodAlerts();
   const [income, setIncome] = useState<IncomeEntry[]>([]);
   const [schedules, setSchedules] = useState<RecurringIncome[]>([]);
   const [open, setOpen] = useState(false);
@@ -133,6 +135,7 @@ function IncomeSection() {
     if (type === 'fixed_monthly') {
       await createRecurringIncome(db, { amount: parsed, frequency: 'monthly', nextDueDate: advanceDate(date, 'monthly'), note });
     }
+    await refreshPeriodAlerts();
     setOpen(false);
     load();
   }
@@ -147,7 +150,7 @@ function IncomeSection() {
           title={entry.note || entry.type.replace('_', ' ')}
           subtitle={entry.note ? `${entry.type.replace('_', ' ')} • ${entry.date}` : entry.date}
           value={formatCurrency(entry.amount)}
-          onDelete={() => deleteIncome(db, entry.id).then(load)}
+          onDelete={() => deleteIncome(db, entry.id).then(load).then(refreshPeriodAlerts)}
         />
       ))}
       {schedules.map((s) => (

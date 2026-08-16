@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PlusIcon } from 'phosphor-react-native';
 import { useDb } from '../../components/db-provider';
 import { useAddExpenseSheet } from '../../components/add-expense-sheet-context';
+import { usePeriodAlerts } from '../../components/period-alerts-context';
 import { useToast } from '../../components/toast-context';
 import { MonthHeatmap, MonthNav } from '../../components/month-heatmap';
 import { BottomSheet } from '../../components/ui/BottomSheet';
@@ -39,6 +40,7 @@ export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
   const { open: openAddSheet, refreshKey } = useAddExpenseSheet();
   const showToast = useToast();
+  const { refresh: refreshPeriodAlerts } = usePeriodAlerts();
 
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -185,6 +187,7 @@ export default function HistoryScreen() {
           onPress: async () => {
             const { deficit, sweepAvailable } = await handleExpenseDeleted(db, expense.id);
             await load();
+            await refreshPeriodAlerts();
             await resolveDeficitOrSweep(deficit, sweepAvailable);
           },
         },
@@ -206,11 +209,13 @@ export default function HistoryScreen() {
       const expenseId = editing.id;
       setEditing(null);
       await load();
+      await refreshPeriodAlerts();
       await resolveDeficitOrSweep(deficit, sweepAvailable, expenseId);
     } else {
       if (noteChanged) await updateExpense(db, editing.id, { note: editNote || null });
       setEditing(null);
       await load();
+      await refreshPeriodAlerts();
     }
   }
 
