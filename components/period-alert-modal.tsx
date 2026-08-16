@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDb } from './db-provider';
 import { useToast } from './toast-context';
@@ -18,7 +18,7 @@ import {
   acknowledgeUncoveredDeficit,
 } from '../src/domain/periodResolution';
 import type { PiggyBank } from '../src/db/schema';
-import { colors, fonts, spacing } from '../constants/theme';
+import { colors, fonts } from '../constants/theme';
 import { formatCurrency } from '../utils/format';
 
 type GoalOption = { bank: PiggyBank; saved: number; remaining: number };
@@ -36,6 +36,11 @@ export function PeriodAlertModal() {
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const [goalAmountText, setGoalAmountText] = useState('');
   const [deficitDialog, setDeficitDialog] = useState<{ remaining: number; actions: DialogAction[] } | null>(null);
+  // Set synchronously by any deficit-dialog action (borrow / mark over-budget) before its own
+  // await, so the deferred check in onDismiss below can tell "an action resolved this" apart
+  // from a plain Cancel/backdrop dismissal. ConfirmDialog calls onDismiss() for every action
+  // press too (see components/ui/ConfirmDialog.tsx), so onDismiss can't assume it means Cancel.
+  const deficitResolvedRef = useRef(false);
 
   const isSurplus = !!current && current.delta > 0;
   const isDeficit = !!current && current.delta < 0;
@@ -77,11 +82,13 @@ export function PeriodAlertModal() {
         label: `Borrow ${formatCurrency(remaining)} from ${bank.productName}`,
         variant: 'accent',
         onPress: async () => {
+          deficitResolvedRef.current = true;
           await borrowDeficitFromGoal(db, periodId, bank.id, remaining);
           await refresh();
         },
       }));
 
+      deficitResolvedRef.current = false;
       setDeficitDialog({
         remaining,
         actions: [
@@ -90,6 +97,7 @@ export function PeriodAlertModal() {
             label: 'Mark this period over-budget',
             variant: 'danger',
             onPress: async () => {
+              deficitResolvedRef.current = true;
               await acknowledgeUncoveredDeficit(db, periodId, remaining);
               await refresh();
             },
@@ -106,7 +114,7 @@ export function PeriodAlertModal() {
   if (!current) return null;
 
   const selectedGoal = goals.find((g) => g.bank.id === selectedGoalId);
-  const goalAmount = selectedGoal ? Math.min(Number(goalAmountText) || 0, current.delta, selectedGoal.remaining) : 0;
+  const goalAmount = selectedGoal ? Math.max(0, Math.min(Number(goalAmountText) || 0, current.delta, selectedGoal.remaining)) : 0;
   const piggyBankAmount = isSurplus ? current.delta - goalAmount : 0;
 
   async function confirmSurplus() {
@@ -194,7 +202,17 @@ export function PeriodAlertModal() {
         actions={deficitDialog?.actions ?? []}
         onDismiss={() => {
           if (current) dismiss(current);
+          const periodId = current?.periodId;
+          const remaining = deficitDialog?.remaining;
           setDeficitDialog(null);
+          // ConfirmDialog invokes onDismiss for action presses too (see ConfirmDialog.tsx),
+          // ahead of the action's own onPress. Defer to a macrotask so any action's
+          // synchronous deficitResolvedRef.current = true (set before its own await) has
+          // already landed by the time we decide whether this was a genuine dismissal.
+          setTimeout(() => {
+            if (deficitResolvedRef.current || periodId == null || remaining == null) return;
+            acknowledgeUncoveredDeficit(db, periodId, remaining).then(() => refresh());
+          }, 0);
         }}
       />
     </>
