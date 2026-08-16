@@ -9,6 +9,9 @@ export async function allocateSurplus(
   delta: number,
   goal?: { piggyBankId: number; amount: number },
 ): Promise<void> {
+  if (delta <= 0) {
+    throw new Error('allocateSurplus requires a positive delta');
+  }
   const goalAmount = goal?.amount ?? 0;
   const remainder = delta - goalAmount;
   const note = `Surplus allocation for period #${periodId}`;
