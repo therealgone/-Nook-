@@ -1,7 +1,7 @@
 import { createTestDb } from '../../db/testDb';
 import { logIncome } from '../../repositories/income';
 import { logExpense, deleteExpense } from '../../repositories/expenses';
-import { addAllocatedSurplus } from '../../repositories/payPeriods';
+import { addAllocatedSurplus, addCoveredDeficit } from '../../repositories/payPeriods';
 import { reconcilePayPeriods, getClosedPeriodBoundaries } from '../payPeriods';
 
 test('no pending actions when fewer than two salary entries exist', async () => {
@@ -59,6 +59,25 @@ test('a retroactive delete of an expense inside a resolved period surfaces the n
   const pending = await reconcilePayPeriods(db);
   expect(pending).toHaveLength(1);
   expect(pending[0].delta).toBe(4000);
+});
+
+test('a retroactive addition of an expense inside a resolved period surfaces the new deficit', async () => {
+  const db = createTestDb();
+  await logIncome(db, { amount: 3000, type: 'fixed_monthly', date: '2026-06-06', note: null });
+  await logExpense(db, { amount: 3500, categoryId: null, date: '2026-06-20', note: null, isRecurring: false });
+  await logIncome(db, { amount: 3000, type: 'fixed_monthly', date: '2026-07-06', note: null });
+
+  const [first] = await reconcilePayPeriods(db);
+  expect(first.delta).toBe(-500);
+  await addCoveredDeficit(db, first.periodId, -first.delta); // fully acknowledged the original $500 deficit
+
+  expect(await reconcilePayPeriods(db)).toHaveLength(0);
+
+  await logExpense(db, { amount: 200, categoryId: null, date: '2026-06-25', note: null, isRecurring: false }); // period now has a $700 deficit, only $500 was ever covered
+
+  const pending = await reconcilePayPeriods(db);
+  expect(pending).toHaveLength(1);
+  expect(pending[0].delta).toBe(-200);
 });
 
 test('income and expenses on the boundary date count toward the period that starts there, not the one that ends there', async () => {

@@ -1,7 +1,7 @@
 import { createTestDb } from '../../db/testDb';
 import { createPiggyBank } from '../../repositories/piggyBanks';
 import { getSavedAmount } from '../../repositories/piggyBankTransactions';
-import { createPayPeriod } from '../../repositories/payPeriods';
+import { createPayPeriod, findPayPeriod } from '../../repositories/payPeriods';
 import { getGeneralSavingsBalance, recordGeneralSavingsTransaction } from '../../repositories/generalSavings';
 import {
   allocateSurplus,
@@ -17,6 +17,8 @@ test('allocates a surplus fully to the Piggy Bank when no goal is chosen', async
   await allocateSurplus(db, period.id, 1000);
 
   expect(await getGeneralSavingsBalance(db)).toBe(1000);
+  const updated = await findPayPeriod(db, period.startDate, period.endDate);
+  expect(updated?.allocatedSurplus).toBe(1000);
 });
 
 test('splits a surplus between a goal and the Piggy Bank, capping the goal at what it needs', async () => {
@@ -58,4 +60,6 @@ test('acknowledging an uncovered deficit updates covered_deficit without moving 
   await acknowledgeUncoveredDeficit(db, period.id, 75);
 
   expect(await getGeneralSavingsBalance(db)).toBe(0);
+  const updated = await findPayPeriod(db, period.startDate, period.endDate);
+  expect(updated?.coveredDeficit).toBe(75);
 });
