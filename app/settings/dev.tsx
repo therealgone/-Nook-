@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useDb } from '../../components/db-provider';
+import { usePeriodAlerts } from '../../components/period-alerts-context';
 import { SettingsHeader } from '../../components/settings-header';
 import { CalendarPicker } from '../../components/calendar-picker';
 import { Button } from '../../components/ui/Button';
@@ -13,6 +14,7 @@ import { getDevDate, setDevDate } from '../../utils/devClock';
 
 export default function DevToolsScreen() {
   const db = useDb();
+  const { refresh: refreshPeriodAlerts } = usePeriodAlerts();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [effectiveDate, setEffectiveDate] = useState(todayIso());
   const [message, setMessage] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export default function DevToolsScreen() {
     setMessage(
       `Materialized ${createdExpenses.length} expense${createdExpenses.length === 1 ? '' : 's'} and ${createdIncome.length} income entr${createdIncome.length === 1 ? 'y' : 'ies'} as of ${todayIso()}`,
     );
+    await refreshPeriodAlerts();
   }
 
   return (
