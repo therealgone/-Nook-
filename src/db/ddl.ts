@@ -69,4 +69,20 @@ CREATE TABLE IF NOT EXISTS piggy_bank_transactions (
   note TEXT,
   created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS pay_periods (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  allocated_surplus REAL NOT NULL DEFAULT 0,
+  covered_deficit REAL NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS general_savings_transactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL,
+  source TEXT NOT NULL,
+  amount REAL NOT NULL,
+  note TEXT,
+  created_at TEXT NOT NULL
+);
 `;

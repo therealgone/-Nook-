@@ -96,6 +96,8 @@ export const piggyBankTransactions = sqliteTable('piggy_bank_transactions', {
       'income_correction',
       'price_decrease_refund',
       'cancel_refund',
+      'period_surplus',
+      'period_deficit',
     ],
   }).notNull(),
   amount: real('amount').notNull(),
@@ -106,3 +108,27 @@ export const piggyBankTransactions = sqliteTable('piggy_bank_transactions', {
 });
 export type PiggyBankTransaction = typeof piggyBankTransactions.$inferSelect;
 export type NewPiggyBankTransaction = typeof piggyBankTransactions.$inferInsert;
+
+export const payPeriods = sqliteTable('pay_periods', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  startDate: text('start_date').notNull(),
+  endDate: text('end_date').notNull(),
+  allocatedSurplus: real('allocated_surplus').notNull().default(0),
+  coveredDeficit: real('covered_deficit').notNull().default(0),
+  createdAt: text('created_at').notNull(),
+});
+export type PayPeriod = typeof payPeriods.$inferSelect;
+export type NewPayPeriod = typeof payPeriods.$inferInsert;
+
+export const generalSavingsTransactions = sqliteTable('general_savings_transactions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  type: text('type', { enum: ['deposit', 'withdrawal'] }).notNull(),
+  source: text('source', {
+    enum: ['period_surplus', 'period_surplus_overflow', 'period_deficit'],
+  }).notNull(),
+  amount: real('amount').notNull(),
+  note: text('note'),
+  createdAt: text('created_at').notNull(),
+});
+export type GeneralSavingsTransaction = typeof generalSavingsTransactions.$inferSelect;
+export type NewGeneralSavingsTransaction = typeof generalSavingsTransactions.$inferInsert;
